@@ -1,45 +1,133 @@
 # glitch-app
 
-This template should help get you started developing with Vue 3 in Vite.
+A web app for character creation and management in _Glitch_ by Dr. Jenna Moran
 
-## Recommended IDE Setup
+Entities:
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- Character
+- Player
+- Luthe
+- Bane
+- attribute
+- attribute value
+- cost
+- cost level
+- infection level
+- gift
+  - name
+  - description
+  - level
+  - cost
+  - activation
+  - range
+  - flexibility
+- bond
+  - truth
+  - technique
+- geas
+  - description
+  - attribute
+  - rating
+- treasure
+- arcanum
+- technique
+- quest
+  - quest arc
+  - xp cost
+  - xp acquired
+  - conditions
 
-## Type Support for `.vue` Imports in TS
+Relations: 
+============
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```
+Character (many) - player (1)
+character (1)   - luthe (1)
+                - bane (1)
+                - infection level (1) 
+                - technique (1) 
+                
+                - gift (many) 
+                - bond (many) 
+                - geas (many) 
+                - treasure (many) 
+                - archanum (many) 
+                - quest (many)
 ```
 
-### Compile and Hot-Reload for Development
+## Tables:
 
-```sh
-npm run dev
+
+### Character 
+```
+id
+player
+name
+luthe
+bane
+infection_level
+technique
 ```
 
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
+###  Gifts 
+```
+id
+character_id
+name
+description
+level
+cost
+activation
+range
+flexibility
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
+### Geasa 
+```
+id
+character_id
+description
+attribute
+rating
 ```
 
-### Lint with [ESLint](https://eslint.org/)
 
-```sh
-npm run lint
+### Bonds 
+```
+id
+character_id
+truth
+technique
+```
+
+## Treasures 
+```
+id
+character_id
+description
+```
+
+### Arcana
+```
+id
+character_id
+description
+```
+
+### Quests
+```
+id
+character_id
+name
+arcs
+cost
+cost_paid
+```
+
+### QuestCondition
+```
+id
+quest_id
+type
+description
 ```

@@ -1,8 +1,19 @@
 import { defineStore } from 'pinia'
-import { Player } from '@/types'
+import { Character, Quest } from '@/types'
+import { randomUUID, type UUID } from 'crypto'
+import { ref, type Ref } from 'vue'
 
-export const usePlayerStore = defineStore('player', {
-  state: () => ({
-    player: Player
-  })
+export const useAppStore = defineStore('app', () => {
+  const characters: Ref<Map<UUID, Character>> = ref(new Map())
+  const quests: Ref<Map<string, Quest>> = ref(new Map())
+  function add_character(char: Character) {
+    const id = randomUUID()
+    characters.value.set(id, char)
+  }
+
+  function add_quest(quest: Quest) {
+    quests.value.set(quest.name, quest)
+  }
+
+  return { characters, add_character, quests, add_quest }
 })
