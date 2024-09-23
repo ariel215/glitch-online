@@ -1,29 +1,31 @@
 <script lang="ts" setup>
 import { useAppStore } from '@/stores/player'
+import { Character } from '@/types'
+import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 const store = useAppStore()
 const route = useRoute()
-const char_id = route.params.id
-const character = store.characters.get(char_id)
+const char_id = Number.parseInt(route.params.id)
+let character = store.characters.get(char_id) || new Character()
 </script>
 
 <template>
   <div class="about">
     <label>
-      Player Name <input type="text" id="character-name" :value="character?.playerName" />
+      Player Name <input type="text" id="character-name" v-model="character.playerName" />
     </label>
     <label>
-      Character Name <input type="text" id="character-name" :value="character?.characterName" />
+      Character Name <input type="text" id="character-name" v-model="character.characterName" />
     </label>
-    <label> Luthe <input type="text" id="luthe" :value="character?.luthe" /> </label>
-    <label> Bane <input type="text" id="bane" :value="character?.bane" /> </label>
+    <label> Luthe <input type="text" id="luthe" v-model="character.luthe" /> </label>
+    <label> Bane <input type="text" id="bane" v-model="character.bane" /> </label>
   </div>
   <div class="stats">
     <div
       v-for="attribute of character?.attributes.keys()"
       :key="attribute"
       :class="attribute"
-      class="attribute" 
+      class="attribute"
     >
       <span> {{ attribute }} </span> <span> {{ character?.attributes.get(attribute) }} </span>
     </div>
