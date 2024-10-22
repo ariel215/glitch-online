@@ -1,12 +1,52 @@
 <script lang="ts" setup>
+import EditGift from '@/components/EditGift.vue'
+import GiftSummary from '@/components/GiftSummary.vue'
 import { useAppStore } from '@/stores/player'
-import { Character } from '@/types'
-import { reactive, ref } from 'vue'
+import { Character, Gift } from '@/types'
+import { ref, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 const store = useAppStore()
 const route = useRoute()
 const char_id = Number.parseInt(route.params.id)
-let character = store.characters.get(char_id) || new Character()
+let character = store.characters.get(char_id)
+if (!character) {
+  character = new Character()
+  store.characters.set(char_id, character)
+}
+let editing: Map<string, boolean> = new Map()
+for (let gift of character.gifts) {
+  editing.set(gift.name, false)
+}
+
+let showGiftEditor = ref(false)
+let giftEdited = new Gift()
+let giftIndex: Ref<number | null, number | null> = ref(null)
+function addGift() {
+  showGiftEditor.value = true
+}
+
+function editGift(idx: number) {
+  showGiftEditor.value = true
+  giftIndex.value = idx
+}
+function resetEditor() {
+  showGiftEditor.value = false
+  giftEdited = new Gift()
+  giftIndex.value = null
+}
+
+function onEditorUpdate(g: Gift) {
+  if (giftIndex.value === null) {
+    character?.gifts.push(g)
+  } else {
+    character.gifts[giftIndex.value] = g
+  }
+  resetEditor()
+}
+
+function deleteGift(index: number) {
+  character?.gifts.splice(index, 1)
+}
 </script>
 
 <template>
@@ -35,10 +75,19 @@ let character = store.characters.get(char_id) || new Character()
   </div>
   <div id="gifts" class="box-list">
     <h3>Gifts</h3>
-    <div v-for="gift in character?.gifts" :key="gift.name.toString()">
-      <h3>{{ gift.name }}</h3>
-      <p>{{ gift.description }}</p>
+    <div v-for="(gift, index) in character?.gifts" :key="index">
+      <GiftSummary :gift="gift" />
+      <button type="button" @click="editGift(index)">Edit</button>
+      <button type="button" @click="deleteGift(index)">Delete</button>
     </div>
+
+    <button type="button" @click="addGift">Add Gift</button>
+    <EditGift
+      v-show="showGiftEditor"
+      :gift="giftEdited"
+      @update="onEditorUpdate"
+      @close="resetEditor"
+    ></EditGift>
   </div>
   <div id="bonds" class="box-list">
     <h3>Bonds</h3>
