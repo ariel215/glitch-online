@@ -2,17 +2,17 @@
 import EditGift from '@/components/EditGift.vue'
 import GiftSummary from '@/components/GiftSummary.vue'
 import { useAppStore } from '@/stores/player'
-import { Character, Gift } from '@/types'
-import { ref, type Ref } from 'vue'
+import { ATTRIBUTES, Character, COSTS, Gift, type Attribute, type Cost } from '@/types'
+import { ref, reactive, type Ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 const store = useAppStore()
 const route = useRoute()
 const char_id = Number.parseInt(route.params.id)
-let character = store.characters.get(char_id)
-if (!character) {
-  character = new Character()
+const character = store.characters.get(char_id) || reactive(new Character())
+if (!store.characters.get(char_id)) {
   store.characters.set(char_id, character)
 }
+let attributes = character.attributes
 let editing: Map<string, boolean> = new Map()
 for (let gift of character.gifts) {
   editing.set(gift.name, false)
@@ -47,10 +47,42 @@ function onEditorUpdate(g: Gift) {
 function deleteGift(index: number) {
   character?.gifts.splice(index, 1)
 }
+
+function tickUp(attribute: Attribute) {
+  let val = attributes.get(attribute)
+  if (val === undefined) {
+    return
+  }
+  if (val < 7) {
+    attributes.set(attribute, val + 1)
+  }
+}
+
+function tickDown(attribute: Attribute) {
+  let val = attributes.get(attribute)
+  if (val === undefined) {
+    return
+  }
+  if (val > 0) {
+    attributes.set(attribute, val - 1)
+  }
+}
+const startingCosts = computed(() => {
+  let costs = {}
+  for (let cost of COSTS) {
+    if (cost === 'Wear') {
+      costs[cost] = 40
+    } else {
+      let attr = ATTRIBUTES[COSTS.indexOf(cost)]
+      costs[cost] = (attributes.get(attr) || 0) * 10
+    }
+  }
+  return costs
+})
 </script>
 
 <template>
-  <div class="about">
+  <div class="info">
     <label>
       Player Name <input type="text" id="character-name" v-model="character.playerName" />
     </label>
@@ -60,17 +92,27 @@ function deleteGift(index: number) {
     <label> Luthe <input type="text" id="luthe" v-model="character.luthe" /> </label>
     <label> Bane <input type="text" id="bane" v-model="character.bane" /> </label>
   </div>
-  <div class="stats">
-    <div
-      v-for="attribute of character?.attributes.keys()"
-      :key="attribute"
-      :class="attribute"
-      class="attribute"
-    >
-      <span> {{ attribute }} </span> <span> {{ character?.attributes.get(attribute) }} </span>
+  <h2>Stats</h2>
+  <div class="attributes-costs">
+    <div class="attributes">
+      <h3>Attributes</h3>
+      <div
+        v-for="attribute of character?.attributes.keys()"
+        :key="attribute"
+        :class="attribute"
+        class="attribute"
+      >
+        <span> {{ attribute }} </span>
+        <button @click="() => tickDown(attribute)">-</button>
+        <span> {{ character?.attributes.get(attribute) }} </span>
+        <button @click="() => tickUp(attribute)">+</button>
+      </div>
     </div>
-    <div v-for="cost of character?.costs.keys()" :key="cost" :class="cost" class="cost">
-      <span> {{ cost }} </span> <span> {{ character?.costs.get(cost) }} </span>
+    <div class="costs">
+      <h3>Starting Costs</h3>
+      <div v-for="cost of character?.costs.keys()" :key="cost" :class="cost" class="cost">
+        <span> {{ cost }} </span> <span> {{ startingCosts[cost] }} </span>
+      </div>
     </div>
   </div>
   <div id="gifts" class="box-list">
@@ -114,30 +156,35 @@ function deleteGift(index: number) {
 </template>
 
 <style lang="css" scoped>
-.about {
-  display: grid;
-  grid-template-columns: auto;
+.info {
+  display: flex;
+  flex-direction: column;
   padding-bottom: 2rem;
   border-bottom: 1px solid black;
 }
 
-.stats {
+.attributes-costs {
   display: grid;
-  grid-template-rows: repeat(1fr, 5);
-  grid-template-columns: 1fr, 4fr;
+  grid-template-columns: 1fr 1fr;
 }
 
-.attribute {
-  grid-column: 1;
+.attributes {
+  display: flex;
+  flex-direction: column;
 }
 
-.cost {
-  grid-column: 2;
+.costs {
+  display: flex;
+  flex-direction: column;
 }
 
 .box-list {
   border-radius: 3px;
   border: 1px solid black;
   min-height: 5rem;
+}
+
+.box-list > * {
+  border-bottom: 1px solid black;
 }
 </style>

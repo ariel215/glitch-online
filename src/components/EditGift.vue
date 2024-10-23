@@ -11,7 +11,7 @@ let gift = ref(props.gift)
 </script>
 
 <template>
-  <VModal>
+  <VModal @close="$emit('close')">
     <template v-slot:header>
       <label> Name: <input type="text" id="name-input" v-model="gift.name" /> </label>
     </template>
@@ -23,7 +23,7 @@ let gift = ref(props.gift)
       <label>
         Cost:
         <select name="cost" id="cost" v-model="gift.cost">
-          <option v-for="option_ in COSTS" value="{{ option_ }}" v-bind:key="option_">
+          <option v-for="option_ in COSTS" :value="option_" v-bind:key="option_">
             {{ option_ }}
           </option>
         </select>
@@ -31,7 +31,7 @@ let gift = ref(props.gift)
       <label>
         Activation
         <select name="activation" id="activation" v-model="gift.activation">
-          <option v-for="option_ in Activations" value="{{ option_ }}" v-bind:key="option_">
+          <option v-for="option_ in Activations" :value="option_" v-bind:key="option_">
             {{ option_ }}
           </option>
         </select>
@@ -39,7 +39,7 @@ let gift = ref(props.gift)
       <label>
         Range
         <select name="range" id="range" v-model="gift.range">
-          <option v-for="option_ in Ranges" value="{{ option_ }}" v-bind:key="option_">
+          <option v-for="option_ in Ranges" :value="option_" v-bind:key="option_">
             {{ option_ }}
           </option>
         </select>
@@ -47,7 +47,7 @@ let gift = ref(props.gift)
       <label>
         Flexibility
         <select name="flex" id="flex" v-model="gift.flexibility">
-          <option v-for="option_ in Flexibilities" value="{{ option_ }}" v-bind:key="option_">
+          <option v-for="option_ in Flexibilities" :value="option_" v-bind:key="option_">
             {{ option_ }}
           </option>
         </select>

@@ -8,8 +8,8 @@ export class Character {
   characterName: string = '(Unknown)'
   luthe: string = ''
   bane: string = '(Unknown)'
-  attributes: Map<Attribute, Number> = new Map()
-  costs: Map<Cost, Number> = new Map()
+  attributes: Map<Attribute, number> = new Map()
+  costs: Map<Cost, number> = new Map()
   infection_level: number = 2
   gifts: Array<Gift> = []
   bonds: Array<Bond> = []
