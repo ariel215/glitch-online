@@ -4,7 +4,7 @@ import { RouterLink, RouterView } from 'vue-router'
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+    <img alt="Vue logo" class="logo" src="@/assets/logo.png" width="330" height="120" />
     <div class="wrapper">
       <nav>
         <RouterLink to="/">Home</RouterLink>
@@ -75,5 +75,12 @@ nav a:first-of-type {
     padding: 1rem 0;
     margin-top: 1rem;
   }
+}
+</style>
+
+<style lang="css">
+body {
+  background-image: url('assets/background.png');
+  background-repeat: repeat;
 }
 </style>

@@ -43,7 +43,7 @@ defineEmits(['close'])
 .modal-header,
 .modal-footer {
   padding: 15px;
-  /* display: flex */
+  display: grid;
 }
 
 .modal-header {
@@ -63,25 +63,5 @@ defineEmits(['close'])
   position: relative;
   padding: 20px 10px;
   height: fit-content;
-}
-
-.btn-close {
-  position: absolute;
-  top: 0;
-  right: 0;
-  border: none;
-  font-size: 20px;
-  padding: 10px;
-  cursor: pointer;
-  font-weight: bold;
-  color: #4aae9b;
-  background: transparent;
-}
-
-.btn-green {
-  color: white;
-  background: #4aae9b;
-  border: 1px solid #4aae9b;
-  border-radius: 2px;
 }
 </style>

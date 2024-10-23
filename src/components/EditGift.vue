@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Activations, COSTS, Flexibilities, Gift, Ranges } from '@/types'
+import { ACTIVATIONS, COSTS, FLEXIBILITIES, Gift, RANGES } from '@/types'
 import { ref } from 'vue'
 import VModal from './VModal.vue'
 const props = defineProps<{ gift: Gift }>()
@@ -7,13 +7,14 @@ defineEmits<{
   (e: 'update', g: Gift): void
   (e: 'close'): void
 }>()
-let gift = ref(props.gift)
+let gift = props.gift.copy()
 </script>
 
 <template>
   <VModal @close="$emit('close')">
     <template v-slot:header>
       <label> Name: <input type="text" id="name-input" v-model="gift.name" /> </label>
+      <button id="button-close" @click="$emit('close')">X</button>
     </template>
     <template v-slot:body>
       <label>
@@ -31,7 +32,7 @@ let gift = ref(props.gift)
       <label>
         Activation
         <select name="activation" id="activation" v-model="gift.activation">
-          <option v-for="option_ in Activations" :value="option_" v-bind:key="option_">
+          <option v-for="option_ in ACTIVATIONS" :value="option_" v-bind:key="option_">
             {{ option_ }}
           </option>
         </select>
@@ -39,7 +40,7 @@ let gift = ref(props.gift)
       <label>
         Range
         <select name="range" id="range" v-model="gift.range">
-          <option v-for="option_ in Ranges" :value="option_" v-bind:key="option_">
+          <option v-for="option_ in RANGES" :value="option_" v-bind:key="option_">
             {{ option_ }}
           </option>
         </select>
@@ -47,7 +48,7 @@ let gift = ref(props.gift)
       <label>
         Flexibility
         <select name="flex" id="flex" v-model="gift.flexibility">
-          <option v-for="option_ in Flexibilities" :value="option_" v-bind:key="option_">
+          <option v-for="option_ in FLEXIBILITIES" :value="option_" v-bind:key="option_">
             {{ option_ }}
           </option>
         </select>
@@ -58,3 +59,18 @@ let gift = ref(props.gift)
     </template>
   </VModal>
 </template>
+
+<style lang="css">
+.modal-header {
+  grid-template-columns: 4fr 1fr;
+}
+.modal-header > :nth-child(even) {
+  justify-self: right;
+}
+</style>
+
+<style lang="css" scoped>
+#button-close {
+  max-width: fit-content;
+}
+</style>

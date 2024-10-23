@@ -19,3 +19,18 @@ a,
     background-color: hsla(160, 100%, 37%, 0.2);
   }
 }
+
+.charm-regular {
+  font-family: 'Charm', serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.charm-bold,
+h1,
+h2,
+h3 {
+  font-family: 'Charm', serif;
+  font-weight: 700;
+  font-style: normal;
+}
