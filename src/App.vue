@@ -14,6 +14,10 @@ import { RouterLink, RouterView } from 'vue-router'
   </header>
 
   <RouterView />
+  <footer>
+    <em> Glitch </em>, the <em>Glitch</em> logo, and all art and text are the copyright and used
+    with the permission of Dr. Jenna Moran
+  </footer>
 </template>
 
 <style scoped>
@@ -74,6 +78,11 @@ nav a:first-of-type {
 
     padding: 1rem 0;
     margin-top: 1rem;
+  }
+
+  footer {
+    position: sticky;
+    bottom: 0;
   }
 }
 </style>

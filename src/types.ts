@@ -52,7 +52,7 @@ export class Bond {
   technique!: string
 }
 
-type Geas = string
+export type Geas = string
 
 export type Activation = 'automatic' | 'invoked' | 'casual' | 'painful'
 export const ACTIVATIONS = ['automatic', 'invoked', 'casual', 'painful']

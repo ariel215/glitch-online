@@ -1,15 +1,10 @@
+<script lang="ts" setup></script>
+
 <template>
   <div class="about">
-    <h1>This is an about page</h1>
+    <p>
+      <em> Glitch </em>, the <em>Glitch</em> logo, and all art and text are the copyright and used
+      with the permission of Dr. Jenna Moran
+    </p>
   </div>
 </template>
-
-<style scoped>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-}
-</style>

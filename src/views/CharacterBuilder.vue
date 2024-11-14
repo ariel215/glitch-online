@@ -1,14 +1,51 @@
 <script lang="ts" setup>
+import EditGeas from '@/components/EditGeas.vue'
 import EditGift from '@/components/EditGift.vue'
 import GiftSummary from '@/components/GiftSummary.vue'
 import { useAppStore } from '@/stores/player'
-import { ATTRIBUTES, Character, CHARPT_MAX, COSTS, Gift, type Attribute } from '@/types'
+import { ATTRIBUTES, Character, CHARPT_MAX, COSTS, Gift, type Attribute, type Geas } from '@/types'
 import { ref, reactive, type Ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 const store = useAppStore()
-const character = reactive(new Character())
+const router = useRouter()
+const route = useRoute()
+
+const character = getCharacter()
+function getCharacter(): Character {
+  if (route.name === 'newCharacter') {
+    return reactive(new Character())
+  } else {
+    let char = store.characters.get(parseInt(route.params.id))
+    if (char === undefined) {
+      router.push({ name: 'newCharacter' })
+      throw 'unreachable'
+    }
+    return char
+  }
+}
+
 function addCharacter() {
   store.add_character(character)
+  router.push('/')
 }
+
+let showGeasEditor = false
+function newGeas() {
+  showGeasEditor = true
+}
+function addGeas(geas: Geas) {
+  character.geasa.push(geas)
+  showGeasEditor = false
+}
+
+function newArcanum() {
+  console.log('new arcanum')
+}
+
+function newTreasure() {
+  console.log('new treasure')
+}
+
 let attributes = character.attributes
 let editing: Map<string, boolean> = new Map()
 for (let gift of character.gifts) {
@@ -150,6 +187,12 @@ const characterComplete = computed(() => {
     </div>
     <button type="button" @click="newGeas()">Add Geas</button>
   </div>
+  <EditGeas
+    v-show="showGeasEditor"
+    :geas="''"
+    @update="addGeas"
+    @close="() => (showGeasEditor = false)"
+  ></EditGeas>
   <div id="treasures" class="box-list">
     <h3>Treasures</h3>
     <p v-for="treasure in character?.treasures" :key="treasure.toString()">{{ treasure }}</p>
@@ -170,7 +213,6 @@ const characterComplete = computed(() => {
     @click="
       () => {
         addCharacter()
-        showCharacter()
       }
     "
   >

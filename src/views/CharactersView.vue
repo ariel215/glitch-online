@@ -6,9 +6,7 @@ const store = useAppStore()
 const characters = store.characters
 const router = useRouter()
 function new_character() {
-  let char = new Character()
-  let id = store.add_character(char)
-  router.push({ name: 'character', params: { id } })
+  router.push({ name: 'newCharacter' })
 }
 </script>
 
