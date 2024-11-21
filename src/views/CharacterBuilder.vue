@@ -1,9 +1,19 @@
 <script lang="ts" setup>
 import EditGeas from '@/components/EditGeas.vue'
 import EditGift from '@/components/EditGift.vue'
+import EditQuest from '@/components/EditQuest.vue'
 import GiftSummary from '@/components/GiftSummary.vue'
 import { useAppStore } from '@/stores/player'
-import { ATTRIBUTES, Character, CHARPT_MAX, COSTS, Gift, type Attribute, type Geas } from '@/types'
+import {
+  ATTRIBUTES,
+  Character,
+  CHARPT_MAX,
+  COSTS,
+  Gift,
+  Quest,
+  type Attribute,
+  type Geas
+} from '@/types'
 import { ref, reactive, type Ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 const store = useAppStore()
@@ -39,11 +49,11 @@ function addGeas(geas: Geas) {
 }
 
 function newArcanum() {
-  console.log('new arcanum')
+  character.arcana.push('')
 }
 
 function newTreasure() {
-  console.log('new treasure')
+  character.treasures.push('')
 }
 
 let attributes = character.attributes
@@ -117,6 +127,17 @@ const startingCosts = computed(() => {
 const characterComplete = computed(() => {
   return character.cp() <= CHARPT_MAX
 })
+
+let editQuest: Ref<boolean> = ref(false)
+function newQuest() {
+  console.log('new quest')
+  editQuest.value = true
+}
+
+function setQuest(quest: Quest) {
+  character.quest = quest
+  editQuest.value = false
+}
 </script>
 
 <template>
@@ -195,29 +216,38 @@ const characterComplete = computed(() => {
   ></EditGeas>
   <div id="treasures" class="box-list">
     <h3>Treasures</h3>
-    <p v-for="treasure in character?.treasures" :key="treasure.toString()">{{ treasure }}</p>
-    <button type="button" @click="newTreasure()">Add Treasure</button>
+    <p>{{ character.treasures.length }} of {{ character.attributes.get('Flore') + 1 }}</p>
+    <p v-for="(treasure, i) in character?.treasures" :key="i">{{ treasure }}</p>
+    <button
+      type="button"
+      @click="newTreasure()"
+      :disabled="character.treasures.length >= character.attributes.get('Flore') + 1"
+    >
+      Add Treasure
+    </button>
   </div>
   <div id="arcana" class="box-list">
     <h3>Arcana</h3>
     <span id="arcana-count"> {{ character?.arcana.length }} of 12</span>
-    <p v-for="arcanum in character?.arcana" :key="arcanum.toString()">{{ arcanum }}</p>
-    <button type="button" @click="newArcanum()">Add Arcanum</button>
+    <p v-for="(arcanum, i) in character?.arcana" :key="i">{{ arcanum }}</p>
+    <button type="button" @click="newArcanum()" :disabled="character.arcana.length >= 12">
+      Add Arcanum
+    </button>
   </div>
   <div id="quests">
     <h2>Quest</h2>
+    <div v-if="character.quest">
+      <h4>{{ character.quest.name }}</h4>
+      <button type="button" @click="() => (character.quest = null)">X</button>
+    </div>
+    <div v-else>
+      <button type="button" @click="newQuest()" :disabled="character.quest !== null">
+        Create New Quest
+      </button>
+    </div>
+    <EditQuest v-show="editQuest" @close="editQuest = false" @update="setQuest" />
   </div>
-  <button
-    type="button"
-    :disabled="!characterComplete"
-    @click="
-      () => {
-        addCharacter()
-      }
-    "
-  >
-    OK
-  </button>
+  <button type="button" :disabled="!characterComplete" @click="addCharacter()">OK</button>
 </template>
 
 <style lang="css" scoped>

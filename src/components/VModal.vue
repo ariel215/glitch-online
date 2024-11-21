@@ -19,7 +19,7 @@ defineEmits(['close'])
   </div>
 </template>
 
-<style lang="css">
+<style scoped lang="css">
 .modal-backdrop {
   position: absolute;
   top: 0;

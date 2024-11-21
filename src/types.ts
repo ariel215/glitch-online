@@ -100,15 +100,16 @@ export enum QuestArc {
 
 export class Quest {
   name!: string
+  description!: string
   arcs!: Array<{ arc: QuestArc; position: number }>
   cost!: number
   cost_paid!: number
   conditions:
     | {
-        anytime: Array<string>
+        anytime: string
       }
     | {
         major: Array<string>
         minor: Array<string>
-      } = { anytime: [] }
+      } = { anytime: '' }
 }
