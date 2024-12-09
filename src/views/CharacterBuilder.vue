@@ -6,6 +6,7 @@ import GiftSummary from '@/components/GiftSummary.vue'
 import { useAppStore } from '@/stores/player'
 import {
   ATTRIBUTES,
+  Bond,
   Character,
   CHARPT_MAX,
   COSTS,
@@ -37,6 +38,10 @@ function getCharacter(): Character {
 function addCharacter() {
   store.add_character(character)
   router.push('/')
+}
+
+function newBond() {
+  character.bonds.push(new Bond())
 }
 
 let showGeasEditor = false
@@ -150,6 +155,10 @@ function setQuest(quest: Quest) {
     </label>
     <label> Luthe <input type="text" id="luthe" v-model="character.luthe" /> </label>
     <label> Bane <input type="text" id="bane" v-model="character.bane" /> </label>
+    <label> Technique <input type="text" v-model="character.technique" /> </label>
+    <label> Sanctuary <input type="text" v-model="character.sanctuary" /></label>
+    <label> Sphere <input type="text" v-model="character.sphere" /> </label>
+    <label> Power of Destruction <input type="text" v-model="character.destruction" /> </label>
     <span> Character points used: </span> <span> {{ character.cp() }} of {{ CHARPT_MAX }}</span>
   </div>
   <h2>Stats</h2>
@@ -196,10 +205,12 @@ function setQuest(quest: Quest) {
   </div>
   <div id="bonds" class="box-list">
     <h3>Bonds</h3>
-    <div v-for="bond in character?.bonds" :key="bond.truth.toString()">
-      <h4>{{ bond.truth }}</h4>
-      <em> Technique: </em> {{ bond.technique }}
+    <div v-for="(bond, i) in character?.bonds" :key="i">
+      <label> Truth: <input type="text" v-model="bond.truth" /></label>
+      <label> Technique: <input type="text" v-model="bond.technique" /></label>
+      <button @click="character.bonds.splice(i, 1)">X</button>
     </div>
+    <button type="button" @click="newBond()">Add Bond</button>
   </div>
   <div id="geasa" class="box-list">
     <h3>Geasa</h3>
@@ -236,12 +247,12 @@ function setQuest(quest: Quest) {
   </div>
   <div id="quests">
     <h2>Quest</h2>
-    <div v-if="character.quest">
-      <h4>{{ character.quest.name }}</h4>
-      <button type="button" @click="() => (character.quest = null)">X</button>
+    <div v-if="character.quests.length">
+      <h4>{{ character.quests[0].name }}</h4>
+      <button type="button" @click="() => (character.quests = [])">X</button>
     </div>
     <div v-else>
-      <button type="button" @click="newQuest()" :disabled="character.quest !== null">
+      <button type="button" @click="newQuest()" :disabled="character.quests.length > 0">
         Create New Quest
       </button>
     </div>

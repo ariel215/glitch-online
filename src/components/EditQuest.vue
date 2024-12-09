@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Quest } from '@/types'
+import { Quest, QuestArc, QUESTARCS } from '@/types'
 import VModal from './VModal.vue'
 import { ref, type Ref } from 'vue'
 
@@ -8,14 +8,14 @@ let mode: Ref<questMode> = ref('anytime')
 let action: string = ''
 let majorGoals: Ref<Array<string>> = ref([])
 let flavorGoals: Ref<Array<string>> = ref([])
-let quest = new Quest()
+let quest = ref(new Quest())
 function makeQuest() {
   if (mode.value == 'anytime') {
-    quest.conditions = {
+    quest.value.conditions = {
       anytime: action
     }
   } else {
-    quest.conditions = {
+    quest.value.conditions = {
       major: majorGoals.value,
       minor: flavorGoals.value
     }
@@ -30,6 +30,27 @@ function makeQuest() {
       <h1>New Quest</h1>
     </template>
     <template v-slot:body>
+      <h3>Arcs:</h3>
+      <div v-for="(arc, i) in quest.arcs" :key="i">
+        <select v-model="arc.arc">
+          <option v-for="(arckind, i) in QUESTARCS" :key="i" :value="arckind">{{ arckind }}</option>
+        </select>
+        <select v-model="arc.position">
+          <option v-for="i in [...Array(5).keys()]" :key="i" :value="i + 1">{{ i + 1 }}</option>
+        </select>
+        <button type="button" @click="quest.arcs.splice(i, 1)">X</button>
+      </div>
+      <button
+        type="button"
+        @click="
+          () => {
+            quest.arcs.push({ arc: QuestArc.Bindings, position: 1 })
+            console.log(quest.arcs.length)
+          }
+        "
+      >
+        Add arc
+      </button>
       <label>
         Quest kind:
         <select name="quest-kind" id="quest-kind" v-model="mode">
@@ -41,7 +62,7 @@ function makeQuest() {
             <label> Name: <input type="text" v-model="quest.name" /></label>
           </p>
           <p>
-            <label> XP: <input type="number" v-model="quest.cost" /></label>
+            <label> XP: <input type="number" v-model="quest.xp_needed" /></label>
           </p>
           <label>
             Description: <br />

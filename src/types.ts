@@ -1,3 +1,5 @@
+import { ref } from 'vue'
+
 export type Attribute = 'Eide' | 'Flore' | 'Lore' | 'Wyrd' | 'Ability'
 export type Cost = 'Stilling' | 'Immersion' | 'Fuge' | 'Burn' | 'Wear'
 export const ATTRIBUTES: Array<Attribute> = ['Eide', 'Flore', 'Lore', 'Wyrd', 'Ability']
@@ -9,6 +11,10 @@ export class Character {
   characterName: string = '(Unknown)'
   luthe: string = ''
   bane: string = '(Unknown)'
+  technique: string = ''
+  sanctuary: string = ''
+  sphere: string = ''
+  destruction: string = ''
   attributes: Map<Attribute, number> = new Map()
   costs: Map<Cost, number> = new Map()
   infection_level: number = 2
@@ -17,8 +23,7 @@ export class Character {
   geasa: Array<Geas> = []
   treasures: Array<string> = []
   arcana: Array<string> = []
-  technique: string = ''
-  quest: Quest | null = null
+  quests: Array<Quest> = []
 
   constructor() {
     for (const attr of ATTRIBUTES) {
@@ -37,12 +42,8 @@ export class Character {
     for (const gift of this.gifts) {
       total += gift.price()
     }
-    for (const _bond of this.bonds) {
-      total += 1
-    }
-    for (const _geas of this.geasa) {
-      total += 1
-    }
+    total += this.bonds.length
+    total += this.geasa.length
     return total
   }
 }
@@ -92,18 +93,48 @@ export class Gift {
   }
 }
 
+export const QUESTARCS = ['Bindings', 'Sheperd', 'Emptiness']
 export enum QuestArc {
   Bindings,
   Shepherd,
   Emptiness
 }
 
-export class Quest {
-  name!: string
-  description!: string
-  arcs!: Array<{ arc: QuestArc; position: number }>
-  cost!: number
-  cost_paid!: number
+export class Arc {
+  arc: QuestArc
+  position: number
+  constructor(arc: QuestArc, position: number) {
+    this.arc = arc
+    this.position = position
+  }
+  toString() {
+    return `${this.arc} ${this.position}`
+  }
+}
+
+type Anytime = {
+  anytime: string
+}
+
+type Storyline = {
+  major: Array<string>
+  minor: Array<string>
+}
+
+export type QuestDescription = {
+  name?: string
+  description?: string
+  arcs?: Array<Arc>
+  xp_needed?: number
+  conditions: Anytime | Storyline
+}
+
+export class Quest implements QuestDescription {
+  name: string = ''
+  description: string = ''
+  arcs: Array<Arc> = []
+  xp_needed: number = 25
+  xp: number = 0
   conditions:
     | {
         anytime: string
@@ -112,4 +143,19 @@ export class Quest {
         major: Array<string>
         minor: Array<string>
       } = { anytime: '' }
+
+  constructor(
+    name?: string,
+    description?: string,
+    arcs?: Array<Arc>,
+    xp_needed?: number,
+    conditions?: Anytime | Storyline
+  ) {
+    this.name = name || ''
+    this.description = description || ''
+    this.arcs = arcs || []
+    this.xp_needed = xp_needed || 25
+    this.xp = 0
+    this.conditions = conditions || { anytime: '' }
+  }
 }

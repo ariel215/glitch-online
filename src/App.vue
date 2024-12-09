@@ -14,10 +14,6 @@ import { RouterLink, RouterView } from 'vue-router'
   </header>
 
   <RouterView />
-  <footer>
-    <em> Glitch </em>, the <em>Glitch</em> logo, and all art and text are the copyright and used
-    with the permission of Dr. Jenna Moran
-  </footer>
 </template>
 
 <style scoped>
