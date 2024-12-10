@@ -1,5 +1,3 @@
-import { ref } from 'vue'
-
 export type Attribute = 'Eide' | 'Flore' | 'Lore' | 'Wyrd' | 'Ability'
 export type Cost = 'Stilling' | 'Immersion' | 'Fuge' | 'Burn' | 'Wear'
 export const ATTRIBUTES: Array<Attribute> = ['Eide', 'Flore', 'Lore', 'Wyrd', 'Ability']

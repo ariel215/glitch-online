@@ -5,12 +5,8 @@
   <div id="character-stats">
     <h3>Stats</h3>
     <div id="attributes-costs">
-      <div id="attributes">
-        <slot name="attributes"></slot>
-      </div>
-      <div id="costs">
-        <slot name="costs"></slot>
-      </div>
+      <slot name="attributes"></slot>
+      <slot name="costs"></slot>
     </div>
   </div>
   <div id="character-features" class="box-list">
@@ -39,8 +35,13 @@
 
 <style lang="css">
 #attributes-costs {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-areas:
+    'ah ah . ch ch'
+    'at at . ct ct'
+    'at at . ct ct'
+    'at at . ct ct'
+    'at at . ct ct';
 }
 
 #charater-info {
@@ -50,10 +51,6 @@
   border-bottom: 1px solid black;
 }
 
-#attributes-costs {
-  display: flex;
-  flex-direction: row;
-}
 .box-list {
   border-radius: 3px;
   border: 1px solid black;
@@ -64,16 +61,32 @@
   border-bottom: 1px solid black;
 }
 
+.attribute-title {
+  grid-area: ah;
+}
+
+.cost-title {
+  grid-area: ch;
+}
+
+#attributes {
+  grid-area: at;
+}
+
+#costs {
+  grid-area: ct;
+}
+
 #attributes,
 #costs {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 }
 
 .attribute,
 .cost {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: 2fr 1fr;
 }
 
 #attribute button {

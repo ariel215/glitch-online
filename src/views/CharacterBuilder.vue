@@ -132,7 +132,15 @@ const startingCosts = computed(() => {
 })
 
 const characterComplete = computed(() => {
-  return character.cp() <= CHARPT_MAX
+  return (
+    character.cp() <= CHARPT_MAX &&
+    character.quests.length == 1 &&
+    character.characterName &&
+    character.technique &&
+    character.sanctuary &&
+    character.sphere &&
+    character.destruction
+  )
 })
 
 let editQuest: Ref<boolean> = ref(false)
@@ -145,43 +153,60 @@ function setQuest(quest: Quest) {
   character.quests.push(quest)
   editQuest.value = false
 }
+
+let charPtsyellow = computed(() => character.cp() < 20)
+let charPtsRed = computed(() => character.cp() > CHARPT_MAX)
+let charPtsGreen = computed(() => 20 <= character.cp() && character.cp() <= CHARPT_MAX)
 </script>
 
 <template>
   <CharacterSheetTemplate>
     <template #character-info>
-      <label>
-        Player Name <input type="text" id="player-name" v-model="character.playerName" />
-      </label>
-      <label>
-        Character Name <input type="text" id="character-name" v-model="character.characterName" />
-      </label>
-      <label> Luthe <input type="text" id="luthe" v-model="character.luthe" /> </label>
-      <label> Bane <input type="text" id="bane" v-model="character.bane" /> </label>
-      <label> Technique <input type="text" v-model="character.technique" /> </label>
-      <label> Sanctuary <input type="text" v-model="character.sanctuary" /></label>
-      <label> Sphere <input type="text" v-model="character.sphere" /> </label>
-      <label> Power of Destruction <input type="text" v-model="character.destruction" /> </label>
-      <span> Character points used: </span> <span> {{ character.cp() }} of {{ CHARPT_MAX }}</span>
+      <div id="names">
+        <label for="character-name"> Character Name </label>
+        <input type="text" id="character-name" v-model="character.characterName" />
+        <label for="luthe"> Luthe </label
+        ><input type="text" id="luthe" v-model="character.luthe" />
+        <label for="bane"> My character is dying of: </label
+        ><input type="text" id="bane" v-model="character.bane" />
+      </div>
+      <div id="background">
+        <label for="technique"> Technique </label
+        ><input type="text" id="technique" v-model="character.technique" />
+        <label for="sanctuary"> Sanctuary </label
+        ><input id="sanctuary" type="text" v-model="character.sanctuary" />
+        <label for="sphere"> Sphere </label
+        ><input id="sphere" type="text" v-model="character.sphere" />
+        <label for="destruction"> Power of Destruction </label
+        ><input id="destruction" type="text" v-model="character.destruction" />
+      </div>
+      <span :class="{ yellow: charPtsyellow, red: charPtsRed, green: charPtsGreen }">
+        {{ character.cp() }} of {{ CHARPT_MAX }}</span
+      >
+      <span> character points used </span>
     </template>
 
     <template #attributes>
-      <h3>Attributes</h3>
-      <div v-for="(attribute, i) of ATTRIBUTES" :key="i" class="attribute">
-        <span> {{ attribute }} </span>
-        <div class="attribute-setter">
-          <button @click="() => tickDown(attribute)">-</button>
-          <span> {{ character?.attributes.get(attribute) }} </span>
-          <button @click="() => tickUp(attribute)">+</button>
-        </div>
-        <span></span>
+      <h4 class="attribute-title">Attributes</h4>
+      <div id="attributes">
+        <template v-for="(attribute, i) of ATTRIBUTES" :key="i">
+          <span class="attribute-name"> {{ attribute }} </span>
+          <div class="attribute-value" :class="'attribute-value-' + i">
+            <button @click="() => tickDown(attribute)">-</button>
+            <span> {{ character?.attributes.get(attribute) }} </span>
+            <button @click="() => tickUp(attribute)">+</button>
+          </div>
+        </template>
       </div>
     </template>
 
     <template #costs>
-      <h3>Starting Costs</h3>
-      <div v-for="cost of character?.costs.keys()" :key="cost" :class="cost" class="cost">
-        <span> {{ cost }} </span> <span> {{ startingCosts.get(cost) }} </span> <span></span>
+      <h4 class="cost-title">Starting Costs</h4>
+      <div id="costs">
+        <template v-for="cost of character?.costs.keys()" :key="cost">
+          <span class="cost-name"> {{ cost }} </span>
+          <span class="cost-value"> {{ startingCosts.get(cost) }} </span>
+        </template>
       </div>
     </template>
 
@@ -204,15 +229,12 @@ function setQuest(quest: Quest) {
     </template>
 
     <template #bonds>
-      <div id="bonds" class="box-list">
-        <h3>Bonds</h3>
-        <div v-for="(bond, i) in character?.bonds" :key="i">
-          <label> Truth: <input type="text" v-model="bond.truth" /></label>
-          <label> Technique: <input type="text" v-model="bond.technique" /></label>
-          <button @click="character.bonds.splice(i, 1)">X</button>
-        </div>
-        <button type="button" @click="newBond()">Add Bond</button>
+      <div v-for="(bond, i) in character?.bonds" :key="i">
+        <label> Truth: <input type="text" v-model="bond.truth" /></label>
+        <label> Technique: <input type="text" v-model="bond.technique" /></label>
+        <button @click="character.bonds.splice(i, 1)">X</button>
       </div>
+      <button type="button" @click="newBond()">Add Bond</button>
     </template>
     <template #geasa>
       <div v-for="geas in character?.geasa" :key="geas">
@@ -257,6 +279,37 @@ function setQuest(quest: Quest) {
       </div>
       <EditQuest v-show="editQuest" @close="editQuest = false" @update="setQuest" />
     </template>
-    <button type="button" :disabled="!characterComplete" @click="addCharacter()">OK</button>
   </CharacterSheetTemplate>
+  <button type="button" :disabled="!characterComplete" @click="addCharacter()">
+    Create Character
+  </button>
 </template>
+
+<style>
+#names {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  margin-bottom: 1rem;
+}
+
+#background {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 2fr;
+}
+
+input {
+  max-width: 15rem;
+}
+
+.yellow {
+  color: #8c5821;
+}
+
+.red {
+  color: var(--bs-red);
+}
+
+.green {
+  color: var(--bs-green);
+}
+</style>
