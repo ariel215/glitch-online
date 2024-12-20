@@ -87,5 +87,14 @@ nav a:first-of-type {
 body {
   background-image: url('assets/background.png');
   background-repeat: repeat;
+  font-size: medium;
+}
+
+@media (min-width: 1440px) {
+  body {
+    position: relative;
+    left: 20%;
+    max-width: 60%;
+  }
 }
 </style>

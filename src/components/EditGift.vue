@@ -1,26 +1,21 @@
 <script setup lang="ts">
 import { ACTIVATIONS, COSTS, FLEXIBILITIES, Gift, RANGES } from '@/types'
-import { ref } from 'vue'
-import VModal from './VModal.vue'
 const props = defineProps<{ gift: Gift }>()
-defineEmits<{
-  (e: 'update', g: Gift): void
-  (e: 'close'): void
-}>()
 let gift = props.gift.copy()
 </script>
 
 <template>
-  <VModal @close="$emit('close')">
-    <template v-slot:header>
+  <div class="card">
+    <div class="card-header">
       <label> Name: <input type="text" id="name-input" v-model="gift.name" /> </label>
       <button id="button-close" @click="$emit('close')">X</button>
-    </template>
-    <template v-slot:body>
+    </div>
+    <div class="card-body">
       <label>
-        Description: <input type="text" id="description-input" v-model="gift.description" />
+        Description: <textarea id="description-input" v-model="gift.description"></textarea>
       </label>
-      <label> Level: <input type="number" min="1" max="12" v-model="gift.level" /> </label>
+      <br />
+      <label> Base Level: <input type="number" min="1" max="12" v-model="gift.level" /> </label>
       <label>
         Cost:
         <select name="cost" id="cost" v-model="gift.cost">
@@ -32,32 +27,29 @@ let gift = props.gift.copy()
       <label>
         Activation
         <select name="activation" id="activation" v-model="gift.activation">
-          <option v-for="option_ in ACTIVATIONS" :value="option_" v-bind:key="option_">
-            {{ option_ }}
+          <option v-for="(option_, i) in ACTIVATIONS" :value="option_" v-bind:key="option_">
+            {{ option_ }} ({{ i * -2 + 1 }} CP)
           </option>
         </select>
       </label>
       <label>
         Range
         <select name="range" id="range" v-model="gift.range">
-          <option v-for="option_ in RANGES" :value="option_" v-bind:key="option_">
-            {{ option_ }}
+          <option v-for="(option_, i) in RANGES" :value="option_" v-bind:key="option_">
+            {{ option_ }} ({{ 1 - 2 * i }} cp)
           </option>
         </select>
       </label>
       <label>
         Flexibility
         <select name="flex" id="flex" v-model="gift.flexibility">
-          <option v-for="option_ in FLEXIBILITIES" :value="option_" v-bind:key="option_">
-            {{ option_ }}
+          <option v-for="(option_, i) in FLEXIBILITIES" :value="option_" v-bind:key="option_">
+            {{ option_ }} ({{ 1 - 2 * i }} cp)
           </option>
         </select>
       </label>
-    </template>
-    <template v-slot:footer>
-      <button class="btn-green" @click="$emit('update', gift)">Ok</button>
-    </template>
-  </VModal>
+    </div>
+  </div>
 </template>
 
 <style lang="css">

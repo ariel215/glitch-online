@@ -1,23 +1,21 @@
 <template>
-  <div id="character-info">
+  <div id="character-info" class="character-section">
+    <h2>About</h2>
     <slot name="character-info"> </slot>
   </div>
-  <div id="character-stats">
-    <h3>Stats</h3>
+  <div id="character-stats" class="character-section">
     <div id="attributes-costs">
       <slot name="attributes"></slot>
       <slot name="costs"></slot>
     </div>
   </div>
-  <div id="character-features" class="box-list">
-    <h3>Gifts</h3>
+  <div id="character-features" class="character-section">
     <slot name="gifts"></slot>
-    <h3>Bonds</h3>
     <slot name="bonds"></slot>
-    <h3>Geasa</h3>
+    <h4>Geasa</h4>
     <slot name="geasa"></slot>
   </div>
-  <div id="treasures-arcana" class="box-list">
+  <div id="treasures-arcana" class="character-section">
     <div id="treasures">
       <h3>Treasures</h3>
       <slot name="treasures"></slot>
@@ -27,7 +25,7 @@
       <slot name="arcana"></slot>
     </div>
   </div>
-  <div id="character-quests" class="box-list">
+  <div id="character-quests" class="character-section">
     <h3>Quests</h3>
     <slot name="quests"></slot>
   </div>
@@ -49,12 +47,6 @@
   flex-direction: column;
   padding-bottom: 2rem;
   border-bottom: 1px solid black;
-}
-
-.box-list {
-  border-radius: 3px;
-  border: 1px solid black;
-  min-height: 5rem;
 }
 
 .box-list > * {
@@ -92,5 +84,11 @@
 #attribute button {
   margin-left: 1em;
   margin-right: 1em;
+}
+
+.character-section {
+  border-bottom: 1px solid grey;
+  padding-bottom: 10px;
+  margin-bottom: 5px;
 }
 </style>

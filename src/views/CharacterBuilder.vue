@@ -1,8 +1,6 @@
 <script lang="ts" setup>
-import EditGeas from '@/components/EditGeas.vue'
 import EditGift from '@/components/EditGift.vue'
 import EditQuest from '@/components/EditQuest.vue'
-import GiftSummary from '@/components/GiftSummary.vue'
 import { useAppStore } from '@/stores/player'
 import {
   ATTRIBUTES,
@@ -13,8 +11,7 @@ import {
   Gift,
   Quest,
   type Attribute,
-  type Cost,
-  type Geas
+  type Cost
 } from '@/types'
 import { ref, reactive, type Ref, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -46,13 +43,8 @@ function newBond() {
   character.bonds.push(new Bond())
 }
 
-let showGeasEditor = false
 function newGeas() {
-  showGeasEditor = true
-}
-function addGeas(geas: Geas) {
-  character.geasa.push(geas)
-  showGeasEditor = false
+  character.geasa.push('')
 }
 
 function newArcanum() {
@@ -67,36 +59,6 @@ let attributes = character.attributes
 let editing: Map<string, boolean> = new Map()
 for (let gift of character.gifts) {
   editing.set(gift.name, false)
-}
-
-let showGiftEditor = ref(false)
-let giftEdited = new Gift()
-let giftIndex: Ref<number | null, number | null> = ref(null)
-function addGift() {
-  showGiftEditor.value = true
-}
-
-function editGift(idx: number) {
-  showGiftEditor.value = true
-  giftIndex.value = idx
-}
-function resetEditor() {
-  showGiftEditor.value = false
-  giftEdited = new Gift()
-  giftIndex.value = null
-}
-
-function onEditorUpdate(g: Gift) {
-  if (giftIndex.value === null) {
-    character?.gifts.push(g)
-  } else {
-    character.gifts[giftIndex.value] = g
-  }
-  resetEditor()
-}
-
-function deleteGift(index: number) {
-  character?.gifts.splice(index, 1)
 }
 
 function tickUp(attribute: Attribute) {
@@ -130,10 +92,13 @@ const startingCosts = computed(() => {
   }
   return costs
 })
+let charPtsyellow = computed(() => character.cp() < 20)
+let charPtsRed = computed(() => character.cp() > CHARPT_MAX)
+let charPtsGreen = computed(() => 20 <= character.cp() && character.cp() <= CHARPT_MAX)
 
 const characterComplete = computed(() => {
   return (
-    character.cp() <= CHARPT_MAX &&
+    charPtsGreen &&
     character.quests.length == 1 &&
     character.characterName &&
     character.technique &&
@@ -153,10 +118,6 @@ function setQuest(quest: Quest) {
   character.quests.push(quest)
   editQuest.value = false
 }
-
-let charPtsyellow = computed(() => character.cp() < 20)
-let charPtsRed = computed(() => character.cp() > CHARPT_MAX)
-let charPtsGreen = computed(() => 20 <= character.cp() && character.cp() <= CHARPT_MAX)
 </script>
 
 <template>
@@ -187,7 +148,10 @@ let charPtsGreen = computed(() => 20 <= character.cp() && character.cp() <= CHAR
     </template>
 
     <template #attributes>
-      <h4 class="attribute-title">Attributes</h4>
+      <div class="heading">
+        <h4 class="attribute-title">Attributes</h4>
+        <em> 3 pts/level of Ability; 2 pts/level otherwise </em>
+      </div>
       <div id="attributes">
         <template v-for="(attribute, i) of ATTRIBUTES" :key="i">
           <span class="attribute-name"> {{ attribute }} </span>
@@ -211,24 +175,18 @@ let charPtsGreen = computed(() => 20 <= character.cp() && character.cp() <= CHAR
     </template>
 
     <template #gifts>
-      <div id="gifts" class="box-list">
+      <h4 v-if="character.gifts">Gifts</h4>
+      <div id="gifts" class="card-group">
         <div v-for="(gift, index) in character?.gifts" :key="index">
-          <GiftSummary :gift="gift" />
-          <button type="button" @click="editGift(index)">Edit</button>
-          <button type="button" @click="deleteGift(index)">Delete</button>
+          <EditGift :gift="gift" @close="character.gifts.splice(index, 1)"></EditGift>
         </div>
-
-        <button type="button" @click="addGift">Add Gift</button>
-        <EditGift
-          v-show="showGiftEditor"
-          :gift="giftEdited"
-          @update="onEditorUpdate"
-          @close="resetEditor"
-        ></EditGift>
       </div>
+      <button type="button" @click="character.gifts.push(new Gift())">Add Gift</button>
     </template>
 
     <template #bonds>
+      <h4>Bonds</h4>
+      <p><em> 1 point each </em></p>
       <div v-for="(bond, i) in character?.bonds" :key="i">
         <label> Truth: <input type="text" v-model="bond.truth" /></label>
         <label> Technique: <input type="text" v-model="bond.technique" /></label>
@@ -237,20 +195,21 @@ let charPtsGreen = computed(() => 20 <= character.cp() && character.cp() <= CHAR
       <button type="button" @click="newBond()">Add Bond</button>
     </template>
     <template #geasa>
-      <div v-for="geas in character?.geasa" :key="geas">
-        <p>{{ geas }}</p>
+      <p><em> 1 point each </em></p>
+      <div v-for="(geas, i) in character?.geasa" :key="geas">
+        <input type="text" v-model="character.geasa[i]" />
+        <button @click="() => character.geasa.splice(i, 1)">X</button>
       </div>
       <button type="button" @click="newGeas()">Add Geas</button>
-      <EditGeas
-        v-show="showGeasEditor"
-        :geas="''"
-        @update="addGeas"
-        @close="() => (showGeasEditor = false)"
-      ></EditGeas>
     </template>
     <template #treasures>
-      <p>{{ character.treasures.length }} of {{ character.attributes.get('Flore') + 1 }}</p>
-      <p v-for="(treasure, i) in character?.treasures" :key="i">{{ treasure }}</p>
+      <p>
+        <em>{{ character.treasures.length }} of {{ character.attributes.get('Flore') + 1 }}</em>
+      </p>
+      <p v-for="(_treasure, i) in character?.treasures" :key="i">
+        <input type="text" v-model="character.treasures[i]" />
+        <button type="button" @click="character.treasures.splice(i, 1)">X</button>
+      </p>
       <button
         type="button"
         @click="newTreasure()"
@@ -261,8 +220,13 @@ let charPtsGreen = computed(() => 20 <= character.cp() && character.cp() <= CHAR
     </template>
 
     <template #arcana>
-      <span id="arcana-count"> {{ character?.arcana.length }} of 12</span>
-      <p v-for="(arcanum, i) in character?.arcana" :key="i">{{ arcanum }}</p>
+      <p id="arcana-count">
+        <em>{{ character?.arcana.length }} of 12</em>
+      </p>
+      <p v-for="(_arcanum, i) in character?.arcana" :key="i">
+        <input type="text" v-model="character.arcana[i]" />
+        <button type="button" @click="character.arcana.splice(i, 1)">X</button>
+      </p>
       <button type="button" @click="newArcanum()" :disabled="character.arcana.length >= 12">
         Add Arcanum
       </button>
@@ -311,5 +275,10 @@ input {
 
 .green {
   color: var(--bs-green);
+}
+
+.card-list {
+  display: flex;
+  flex-direction: row;
 }
 </style>

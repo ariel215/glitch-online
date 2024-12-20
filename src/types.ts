@@ -75,7 +75,7 @@ export class Gift {
     cost += RANGES.indexOf(this.range) * -2 + 1
     cost += FLEXIBILITIES.indexOf(this.flexibility) * -2 + 1
     cost += this.level
-    return cost
+    return Math.min(cost, 1)
   }
 
   copy(): Gift {
