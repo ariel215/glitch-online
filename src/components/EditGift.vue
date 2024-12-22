@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ACTIVATIONS, COSTS, FLEXIBILITIES, Gift, RANGES } from '@/types'
-const props = defineProps<{ gift: Gift }>()
-let gift = props.gift.copy()
+let gift = defineModel({ type: Gift })
 </script>
 
 <template>
   <div class="card">
     <div class="card-header">
       <label> Name: <input type="text" id="name-input" v-model="gift.name" /> </label>
+      <em> {{ gift.price() }} CP </em>
       <button id="button-close" @click="$emit('close')">X</button>
     </div>
     <div class="card-body">
@@ -64,5 +64,12 @@ let gift = props.gift.copy()
 <style lang="css" scoped>
 #button-close {
   max-width: fit-content;
+}
+.card-header {
+  display: grid;
+  grid-template-columns: 80% 10% 10%;
+}
+.card-header button {
+  justify-self: end;
 }
 </style>

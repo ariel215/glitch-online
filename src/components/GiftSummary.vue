@@ -5,7 +5,14 @@ const { gift } = defineProps<{ gift: Gift }>()
 </script>
 
 <template>
-  <h1>{{ gift.name }}</h1>
-  <p>{{ gift.cost }} {{ gift.level }}</p>
-  <p>{{ gift.description }}</p>
+  <div class="card">
+    <h4 class="card-header">{{ gift.name }}</h4>
+    <div class="card-body">
+      <p>{{ gift.description }}</p>
+      <p>A {{ gift.cost }} {{ gift.level }} miracle</p>
+      <p>
+        {{ gift.activation }} activation, {{ gift.range }} range, {{ gift.flexibility }} flexibility
+      </p>
+    </div>
+  </div>
 </template>

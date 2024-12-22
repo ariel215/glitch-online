@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { Quest, QuestArc, QUESTARCS } from '@/types'
-import { ref, type Ref } from 'vue'
+import { Quest, QuestArc, QUESTARCS, type Anytime, type Storyline } from '@/types'
+import { ref, useTemplateRef, type Ref } from 'vue'
 
 type questMode = 'anytime' | 'storyline'
 let mode: Ref<questMode> = ref('anytime')
-let action: string = ''
-let majorGoals: Ref<Array<string>> = ref([])
-let flavorGoals: Ref<Array<string>> = ref([])
-let quest = ref(new Quest())
-function makeQuest() {
-  if (mode.value == 'anytime') {
-    quest.value.conditions = {
-      anytime: action
-    }
+let quest = defineModel({ type: Quest })
+let anytime: Anytime = {
+  anytime: ''
+}
+let storyline: Storyline = {
+  major: [],
+  minor: []
+}
+let questKind = useTemplateRef('questKind')
+
+function updateConditions() {
+  if (questKind.value?.value === 'anytime') {
+    quest.value.conditions = anytime
   } else {
-    quest.value.conditions = {
-      major: majorGoals.value,
-      minor: flavorGoals.value
-    }
+    quest.value.conditions = storyline
   }
-  return quest
 }
 </script>
 
@@ -55,7 +55,7 @@ function makeQuest() {
     </button>
     <label>
       Quest kind:
-      <select name="quest-kind" id="quest-kind" v-model="mode">
+      <select name="quest-kind" id="quest-kind" ref="questKind" @change="updateConditions">
         <option value="anytime">Anytime</option>
         <option value="storyline">Story Line</option>
       </select>
@@ -69,29 +69,30 @@ function makeQuest() {
         </label>
         <div v-if="mode === 'anytime'" id="anytime-quest">
           <p>Mark 1 XP on this quest any time you do the following:</p>
-          <textarea id="quest-action" v-model="action"></textarea>
+          <textarea id="quest-action" v-model="anytime"></textarea>
         </div>
         <div v-if="mode === 'storyline'" id="storyline-quest">
           <p>Get 5 xp, once, if:</p>
-          <div v-for="(_, i) in majorGoals" v-bind:key="i">
+          <div v-for="(_, i) in storyline.major" v-bind:key="i">
             <p>
-              <input type="text" v-model="majorGoals[i]" />
-              <button @click="() => majorGoals.splice(i, 1)">X</button>
+              <input type="text" v-model="storyline.major[i]" />
+              <button @click="() => storyline.major.splice(i, 1)">X</button>
             </p>
           </div>
-          <button type="button" @click="() => majorGoals.push('')">Add major goal</button>
+          <button type="button" @click="() => storyline.major.push('')">Add major goal</button>
           <p>Get 1 xp whenever:</p>
-          <div v-for="(goal, i) in flavorGoals" v-bind:key="goal">
+          <div v-for="(goal, i) in storyline.minor" v-bind:key="goal">
             <p>
-              <input type="text" v-model="flavorGoals[i]" />
-              <button @click="() => flavorGoals.splice(i, 1)">X</button>
+              <input type="text" v-model="storyline.minor[i]" />
+              <button @click="() => storyline.minor.splice(i, 1)">X</button>
             </p>
           </div>
-          <button type="button" @click="() => flavorGoals.push('')">Add quest flavor goal</button>
+          <button type="button" @click="() => storyline.minor.push('')">
+            Add quest flavor goal
+          </button>
         </div>
       </div>
     </label>
-    <button class="btn-green" @click="$emit('update', makeQuest())">Ok</button>
   </div>
 </template>
 

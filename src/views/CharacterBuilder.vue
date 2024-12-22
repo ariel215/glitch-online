@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import EditGift from '@/components/EditGift.vue'
 import EditQuest from '@/components/EditQuest.vue'
-import { useAppStore } from '@/stores/player'
 import {
   ATTRIBUTES,
   Bond,
@@ -13,17 +12,19 @@ import {
   type Attribute,
   type Cost
 } from '@/types'
-import { ref, reactive, type Ref, computed } from 'vue'
+import { ref, reactive, type Ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CharacterSheetTemplate from './CharacterSheetTemplate.vue'
-const store = useAppStore()
+import { useCharacterStore } from '@/stores/player'
+const store = useCharacterStore()
 const router = useRouter()
 const route = useRoute()
 
 const character = getCharacter()
 function getCharacter(): Character {
   if (route.name === 'newCharacter') {
-    return reactive(new Character())
+    let char = reactive(new Character())
+    return char
   } else {
     let char = store.characters.get(parseInt(route.params.id))
     if (char === undefined) {
@@ -33,11 +34,11 @@ function getCharacter(): Character {
     return char
   }
 }
-
 function addCharacter() {
-  store.add_character(character)
-  router.push('/')
+  router.push({ name: 'character', params: { id: character.id } })
 }
+
+watch(character, (c) => c.persist())
 
 function newBond() {
   character.bonds.push(new Bond())
@@ -110,8 +111,7 @@ const characterComplete = computed(() => {
 
 let editQuest: Ref<boolean> = ref(false)
 function newQuest() {
-  console.log('new quest')
-  editQuest.value = true
+  character.quests.push(new Quest())
 }
 
 function setQuest(quest: Quest) {
@@ -178,7 +178,10 @@ function setQuest(quest: Quest) {
       <h4 v-if="character.gifts">Gifts</h4>
       <div id="gifts" class="card-group">
         <div v-for="(gift, index) in character?.gifts" :key="index">
-          <EditGift :gift="gift" @close="character.gifts.splice(index, 1)"></EditGift>
+          <EditGift
+            v-model="character.gifts[index]"
+            @close="character.gifts.splice(index, 1)"
+          ></EditGift>
         </div>
       </div>
       <button type="button" @click="character.gifts.push(new Gift())">Add Gift</button>
@@ -194,6 +197,7 @@ function setQuest(quest: Quest) {
       </div>
       <button type="button" @click="newBond()">Add Bond</button>
     </template>
+
     <template #geasa>
       <p><em> 1 point each </em></p>
       <div v-for="(geas, i) in character?.geasa" :key="geas">
@@ -233,7 +237,7 @@ function setQuest(quest: Quest) {
     </template>
     <template #quests>
       <div v-if="character.quests.length">
-        <h4>{{ character.quests[0].name }}</h4>
+        <EditQuest v-model="character.quests[0]" />
         <button type="button" @click="() => (character.quests = [])">X</button>
       </div>
       <div v-else>
@@ -241,7 +245,6 @@ function setQuest(quest: Quest) {
           Create New Quest
         </button>
       </div>
-      <EditQuest v-show="editQuest" @close="editQuest = false" @update="setQuest" />
     </template>
   </CharacterSheetTemplate>
   <button type="button" :disabled="!characterComplete" @click="addCharacter()">

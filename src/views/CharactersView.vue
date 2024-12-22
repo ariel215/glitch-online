@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { useAppStore } from '@/stores/player'
-import { Character } from '@/types'
+import { useCharacterStore } from '@/stores/player'
 import { useRouter } from 'vue-router'
-const store = useAppStore()
+const store = useCharacterStore()
 const characters = store.characters
 const router = useRouter()
 function new_character() {

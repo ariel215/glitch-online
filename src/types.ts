@@ -5,6 +5,10 @@ export const COSTS: Array<Cost> = ['Stilling', 'Immersion', 'Fuge', 'Burn', 'Wea
 export const CHARPT_MAX: number = 25
 
 export class Character {
+  static curr_id = 0
+  static character_ids: Set<number> = new Set()
+
+  id: number
   playerName: string = '(Unknown)'
   characterName: string = '(Unknown)'
   luthe: string = ''
@@ -23,12 +27,58 @@ export class Character {
   arcana: Array<string> = []
   quests: Array<Quest> = []
 
-  constructor() {
-    for (const attr of ATTRIBUTES) {
-      this.attributes.set(attr, 0)
+  constructor(params: Character | null = null) {
+    if (!params) {
+      this.id = Character.curr_id
+      Character.curr_id += 1
+      Character.character_ids.add(this.id)
+      localStorage.setItem('character_ids', JSON.stringify(Character.character_ids))
+      for (const attr of ATTRIBUTES) {
+        this.attributes.set(attr, 0)
+      }
+      for (const cost of COSTS) {
+        this.costs.set(cost, 0)
+      }
+    } else {
+      this.id = Character.curr_id
+      Object.assign(this, params)
     }
-    for (const cost of COSTS) {
-      this.costs.set(cost, 0)
+  }
+
+  /// Save to localStorage
+  persist() {
+    localStorage.setItem(Character.storage_name(this.id), JSON.stringify(this))
+  }
+
+  /// Delete from localStorage and from
+  remove() {
+    localStorage.removeItem(Character.storage_name(this.id))
+    Character.character_ids.delete(this.id)
+    localStorage.setItem('character_ids', JSON.stringify(Character.character_ids))
+  }
+
+  static storage_name(id: number): string {
+    return `character_${id}`
+  }
+
+  static load(id: number): Character | undefined {
+    const char_str = localStorage.getItem(Character.storage_name(id))
+    if (char_str) {
+      const char = new Character(JSON.parse(char_str))
+      Character.curr_id = Math.max(char.id + 1, Character.curr_id)
+      return char
+    } else {
+      return undefined
+    }
+  }
+
+  static load_ids() {
+    const character_ids = localStorage.getItem('character_ids')
+    if (character_ids !== null) {
+      Character.character_ids = JSON.parse(character_ids)
+      Character.curr_id = Math.max(...Character.character_ids.values()) + 1
+    } else {
+      localStorage.setItem('character_ids', '[]')
     }
   }
 
@@ -110,11 +160,11 @@ export class Arc {
   }
 }
 
-type Anytime = {
+export type Anytime = {
   anytime: string
 }
 
-type Storyline = {
+export type Storyline = {
   major: Array<string>
   minor: Array<string>
 }

@@ -1,41 +1,26 @@
 <script setup lang="ts">
-import EditGeas from '@/components/EditGeas.vue'
-import EditGift from '@/components/EditGift.vue'
 import EditQuest from '@/components/EditQuest.vue'
 import GiftSummary from '@/components/GiftSummary.vue'
-import { useAppStore } from '@/stores/player'
-import {
-  ATTRIBUTES,
-  Bond,
-  Character,
-  CHARPT_MAX,
-  COSTS,
-  Gift,
-  Quest,
-  type Attribute,
-  type Cost,
-  type Geas
-} from '@/types'
-import { ref, reactive, type Ref, computed } from 'vue'
+import { useCharacterStore } from '@/stores/player'
+import { ATTRIBUTES, Character, COSTS, Quest, type Cost } from '@/types'
 import { useRoute, useRouter } from 'vue-router'
 import CharacterSheetTemplate from './CharacterSheetTemplate.vue'
-const store = useAppStore()
+import { watch } from 'vue'
 const router = useRouter()
 const route = useRoute()
-
+const store = useCharacterStore()
 const character = getCharacter()
 function getCharacter(): Character {
-  if (route.name === 'newCharacter') {
-    return reactive(new Character())
-  } else {
-    let char = store.characters.get(parseInt(route.params.id))
-    if (char === undefined) {
-      router.push({ name: 'newCharacter' })
-      throw 'unreachable'
-    }
-    return char
+  let char = store.characters.get(parseInt(route.params.id))
+  if (char === undefined) {
+    alert('Could not find character requested')
+    router.back()
+    throw Error('unreachable')
   }
+  return char
 }
+
+watch(character, (c: Character) => c.persist())
 
 function tickDown(cost: Cost) {
   let c = character.costs.get(cost)
@@ -55,8 +40,9 @@ function markXP(quest: Quest, xp: number) {
   quest.xp += xp
 }
 
+let editingQuest = false
 function newQuest() {
-  alert('implement me pls')
+  editingQuest = true
 }
 </script>
 
@@ -68,10 +54,12 @@ function newQuest() {
         (which means <em>{{ character.luthe }} </em>)
       </p>
       <p>who is dying of {{ character.bane }}</p>
-      <p>Technique: {{ character.technique }}</p>
-      <p>Sphere: {{ character.sphere }}</p>
-      <p>Sanctuary: {{ character.sanctuary }}</p>
-      <p>Power of destruction: {{ character.destruction }}</p>
+      <ul>
+        <li>Technique: {{ character.technique }}</li>
+        <li>Sphere: {{ character.sphere }}</li>
+        <li>Sanctuary: {{ character.sanctuary }}</li>
+        <li>Power of destruction: {{ character.destruction }}</li>
+      </ul>
     </template>
 
     <template #attributes>
@@ -94,12 +82,14 @@ function newQuest() {
     <template #gifts>
       <GiftSummary v-for="(gift, i) in character.gifts" :key="i" :gift="gift"></GiftSummary>
     </template>
+
     <template #bonds>
       <div class="bond" v-for="(bond, i) in character.bonds" :key="i">
         <span class="truth"> {{ bond.truth }}</span>
         <span class="technique"> {{ bond.technique }} </span>
       </div>
     </template>
+
     <template #geasa>
       <p v-for="(geas, i) in character.geasa" :key="i">{{ geas }}</p></template
     >
@@ -108,9 +98,13 @@ function newQuest() {
       <QuestCard
         v-for="(quest, i) in character.quests"
         :key="i"
-        :quest="quest"
+        v-model="character.quests[i]"
         @mark="(xp: number) => markXP(quest, xp)"
       ></QuestCard>
+      <EditQuest
+        v-if="editingQuest"
+        v-model="character.quests[character.quests.length - 1]"
+      ></EditQuest>
       <button @click="newQuest" :disabled="character.quests.length >= 5">Add Quest</button>
     </template>
   </CharacterSheetTemplate>
