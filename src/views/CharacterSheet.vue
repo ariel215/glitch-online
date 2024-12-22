@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import EditQuest from '@/components/EditQuest.vue'
 import GiftSummary from '@/components/GiftSummary.vue'
-import { useCharacterStore } from '@/stores/player'
+import QuestCard from '@/components/QuestCard.vue'
+import { useCharacterStore } from '@/stores/character'
 import { ATTRIBUTES, Character, COSTS, Quest, type Cost } from '@/types'
 import { useRoute, useRouter } from 'vue-router'
 import CharacterSheetTemplate from './CharacterSheetTemplate.vue'
@@ -15,12 +16,14 @@ function getCharacter(): Character {
   if (char === undefined) {
     alert('Could not find character requested')
     router.back()
-    throw Error('unreachable')
   }
   return char
 }
 
-watch(character, (c: Character) => c.persist())
+watch(character, (c: Character) => {
+  console.log('character changed!')
+  store.saveCharacter(c)
+})
 
 function tickDown(cost: Cost) {
   let c = character.costs.get(cost)
@@ -95,12 +98,12 @@ function newQuest() {
     >
 
     <template #quests>
-      <QuestCard
+      <!-- <QuestCard
         v-for="(quest, i) in character.quests"
         :key="i"
         v-model="character.quests[i]"
         @mark="(xp: number) => markXP(quest, xp)"
-      ></QuestCard>
+      ></QuestCard> -->
       <EditQuest
         v-if="editingQuest"
         v-model="character.quests[character.quests.length - 1]"

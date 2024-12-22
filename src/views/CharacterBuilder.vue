@@ -9,13 +9,12 @@ import {
   COSTS,
   Gift,
   Quest,
-  type Attribute,
-  type Cost
+  type Attribute
 } from '@/types'
-import { ref, reactive, type Ref, computed, watch } from 'vue'
+import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CharacterSheetTemplate from './CharacterSheetTemplate.vue'
-import { useCharacterStore } from '@/stores/player'
+import { useCharacterStore } from '@/stores/character'
 const store = useCharacterStore()
 const router = useRouter()
 const route = useRoute()
@@ -23,8 +22,7 @@ const route = useRoute()
 const character = getCharacter()
 function getCharacter(): Character {
   if (route.name === 'newCharacter') {
-    let char = reactive(new Character())
-    return char
+    return store.newCharacter()
   } else {
     let char = store.characters.get(parseInt(route.params.id))
     if (char === undefined) {
@@ -38,7 +36,7 @@ function addCharacter() {
   router.push({ name: 'character', params: { id: character.id } })
 }
 
-watch(character, (c) => c.persist())
+watch(character, (c) => store.saveCharacter(c))
 
 function newBond() {
   character.bonds.push(new Bond())
@@ -81,8 +79,9 @@ function tickDown(attribute: Attribute) {
     attributes.set(attribute, val - 1)
   }
 }
-const startingCosts = computed(() => {
-  let costs = new Map<Cost, number>()
+
+let costs = computed(() => {
+  let costs = character.costs
   for (let cost of COSTS) {
     if (cost === 'Wear') {
       costs.set(cost, 40)
@@ -93,6 +92,7 @@ const startingCosts = computed(() => {
   }
   return costs
 })
+
 let charPtsyellow = computed(() => character.cp() < 20)
 let charPtsRed = computed(() => character.cp() > CHARPT_MAX)
 let charPtsGreen = computed(() => 20 <= character.cp() && character.cp() <= CHARPT_MAX)
@@ -109,14 +109,8 @@ const characterComplete = computed(() => {
   )
 })
 
-let editQuest: Ref<boolean> = ref(false)
 function newQuest() {
   character.quests.push(new Quest())
-}
-
-function setQuest(quest: Quest) {
-  character.quests.push(quest)
-  editQuest.value = false
 }
 </script>
 
@@ -169,7 +163,7 @@ function setQuest(quest: Quest) {
       <div id="costs">
         <template v-for="cost of character?.costs.keys()" :key="cost">
           <span class="cost-name"> {{ cost }} </span>
-          <span class="cost-value"> {{ startingCosts.get(cost) }} </span>
+          <span class="cost-value"> {{ costs.get(cost) }} </span>
         </template>
       </div>
     </template>

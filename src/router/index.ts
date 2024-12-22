@@ -13,8 +13,8 @@ const router = createRouter({
       component: CharactersView
     },
     {
-      path: '/character/new',
-      name: 'newCharacter',
+      path: '/edit/:id',
+      name: 'editCharacter',
       component: CharacterBuilder
     },
     {

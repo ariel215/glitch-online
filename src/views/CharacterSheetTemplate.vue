@@ -1,33 +1,35 @@
 <template>
-  <div id="character-info" class="character-section">
-    <h2>About</h2>
-    <slot name="character-info"> </slot>
-  </div>
-  <div id="character-stats" class="character-section">
-    <div id="attributes-costs">
-      <slot name="attributes"></slot>
-      <slot name="costs"></slot>
+  <div id="character-sheet">
+    <div id="character-info" class="character-section">
+      <h2>About</h2>
+      <slot name="character-info"> </slot>
     </div>
-  </div>
-  <div id="character-features" class="character-section">
-    <slot name="gifts"></slot>
-    <slot name="bonds"></slot>
-    <h4>Geasa</h4>
-    <slot name="geasa"></slot>
-  </div>
-  <div id="treasures-arcana" class="character-section">
-    <div id="treasures">
-      <h3>Treasures</h3>
-      <slot name="treasures"></slot>
+    <div id="character-stats" class="character-section">
+      <div id="attributes-costs">
+        <slot name="attributes"></slot>
+        <slot name="costs"></slot>
+      </div>
     </div>
-    <div id="arcana">
-      <h3>Arcana</h3>
-      <slot name="arcana"></slot>
+    <div id="character-features" class="character-section">
+      <slot name="gifts"></slot>
+      <slot name="bonds"></slot>
+      <h4>Geasa</h4>
+      <slot name="geasa"></slot>
     </div>
-  </div>
-  <div id="character-quests" class="character-section">
-    <h3>Quests</h3>
-    <slot name="quests"></slot>
+    <div id="treasures-arcana" class="character-section">
+      <div id="treasures">
+        <h3>Treasures</h3>
+        <slot name="treasures"></slot>
+      </div>
+      <div id="arcana">
+        <h3>Arcana</h3>
+        <slot name="arcana"></slot>
+      </div>
+    </div>
+    <div id="character-quests" class="character-section">
+      <h3>Quests</h3>
+      <slot name="quests"></slot>
+    </div>
   </div>
 </template>
 

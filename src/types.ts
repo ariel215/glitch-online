@@ -6,7 +6,6 @@ export const CHARPT_MAX: number = 25
 
 export class Character {
   static curr_id = 0
-  static character_ids: Set<number> = new Set()
 
   id: number
   playerName: string = '(Unknown)'
@@ -31,8 +30,6 @@ export class Character {
     if (!params) {
       this.id = Character.curr_id
       Character.curr_id += 1
-      Character.character_ids.add(this.id)
-      localStorage.setItem('character_ids', JSON.stringify(Character.character_ids))
       for (const attr of ATTRIBUTES) {
         this.attributes.set(attr, 0)
       }
@@ -42,43 +39,14 @@ export class Character {
     } else {
       this.id = Character.curr_id
       Object.assign(this, params)
-    }
-  }
-
-  /// Save to localStorage
-  persist() {
-    localStorage.setItem(Character.storage_name(this.id), JSON.stringify(this))
-  }
-
-  /// Delete from localStorage and from
-  remove() {
-    localStorage.removeItem(Character.storage_name(this.id))
-    Character.character_ids.delete(this.id)
-    localStorage.setItem('character_ids', JSON.stringify(Character.character_ids))
-  }
-
-  static storage_name(id: number): string {
-    return `character_${id}`
-  }
-
-  static load(id: number): Character | undefined {
-    const char_str = localStorage.getItem(Character.storage_name(id))
-    if (char_str) {
-      const char = new Character(JSON.parse(char_str))
-      Character.curr_id = Math.max(char.id + 1, Character.curr_id)
-      return char
-    } else {
-      return undefined
-    }
-  }
-
-  static load_ids() {
-    const character_ids = localStorage.getItem('character_ids')
-    if (character_ids !== null) {
-      Character.character_ids = JSON.parse(character_ids)
-      Character.curr_id = Math.max(...Character.character_ids.values()) + 1
-    } else {
-      localStorage.setItem('character_ids', '[]')
+      this.attributes = new Map()
+      for (const [k, v] of Object.entries(params.attributes)) {
+        this.attributes.set(k, v)
+      }
+      this.costs = new Map()
+      for (const [k, v] of Object.entries(params.costs)) {
+        this.costs.set(k, v)
+      }
     }
   }
 
@@ -119,6 +87,9 @@ export class Gift {
   range: Range = 'local'
   flexibility: Flexibility = 'limited'
 
+  constructor(params: Gift = {} as Gift) {
+    Object.assign(this, params)
+  }
   price(): number {
     let cost = 0
     cost += ACTIVATIONS.indexOf(this.activation) * -2 + 1
@@ -192,18 +163,7 @@ export class Quest implements QuestDescription {
         minor: Array<string>
       } = { anytime: '' }
 
-  constructor(
-    name?: string,
-    description?: string,
-    arcs?: Array<Arc>,
-    xp_needed?: number,
-    conditions?: Anytime | Storyline
-  ) {
-    this.name = name || ''
-    this.description = description || ''
-    this.arcs = arcs || []
-    this.xp_needed = xp_needed || 25
-    this.xp = 0
-    this.conditions = conditions || { anytime: '' }
+  constructor(params: QuestDescription = {} as QuestDescription) {
+    Object.assign(this, params)
   }
 }
