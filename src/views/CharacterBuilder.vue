@@ -170,7 +170,8 @@ function newQuest() {
 
     <template #gifts>
       <h4 v-if="character.gifts">Gifts</h4>
-      <div id="gifts" class="card-group">
+      <p><em> 1+ points each</em></p>
+      <div id="gifts" class="card-list">
         <div v-for="(gift, index) in character?.gifts" :key="index">
           <EditGift
             v-model="character.gifts[index]"
@@ -184,19 +185,35 @@ function newQuest() {
     <template #bonds>
       <h4>Bonds</h4>
       <p><em> 1 point each </em></p>
-      <div v-for="(bond, i) in character?.bonds" :key="i">
-        <label> Truth: <input type="text" v-model="bond.truth" /></label>
-        <label> Technique: <input type="text" v-model="bond.technique" /></label>
-        <button @click="character.bonds.splice(i, 1)">X</button>
+      <div class="card-list">
+        <div v-for="(bond, i) in character?.bonds" :key="i" class="card card-small">
+          <div class="card-header">
+            <button @click="character.bonds.splice(i, 1)">X</button>
+          </div>
+          <div class="card-body">
+            <p>
+              <label> Truth: <input type="text" v-model="bond.truth" /></label>
+            </p>
+            <p>
+              <label> Technique: <input type="text" v-model="bond.technique" /></label>
+            </p>
+          </div>
+        </div>
       </div>
       <button type="button" @click="newBond()">Add Bond</button>
     </template>
 
     <template #geasa>
       <p><em> 1 point each </em></p>
-      <div v-for="(geas, i) in character?.geasa" :key="geas">
-        <input type="text" v-model="character.geasa[i]" />
-        <button @click="() => character.geasa.splice(i, 1)">X</button>
+      <div class="card-list">
+        <div v-for="(geas, i) in character?.geasa" :key="geas" class="card card-small">
+          <div class="card-header">
+            <button @click="() => character.geasa.splice(i, 1)">X</button>
+          </div>
+          <div class="card-body">
+            <label> Geas: <input type="text" v-model="character.geasa[i]" /> </label>
+          </div>
+        </div>
       </div>
       <button type="button" @click="newGeas()">Add Geas</button>
     </template>
@@ -277,5 +294,13 @@ input {
 .card-list {
   display: flex;
   flex-direction: row;
+}
+
+.card {
+  min-height: 5rem;
+}
+
+.card-small {
+  width: 20rem;
 }
 </style>

@@ -19,17 +19,22 @@ function newCharacter() {
   <table>
     <thead>
       <tr>
-        <th scope="column">Characters</th>
+        <th scope="column"><h2>Characters</h2></th>
       </tr>
     </thead>
     <tbody>
       <tr v-if="characters.size == 0"></tr>
       <tr v-for="[id, character] in characters.entries()" :key="character.characterName">
-        <td>
+        <td class="character-select">
           <RouterLink :to="{ name: 'character', params: { id: id } }">
             {{ character.characterName }}, dying of {{ character.bane }}
           </RouterLink>
-          <button @click="() => store.deleteCharacter(character)">Delete</button>
+          <div class="character-buttons">
+            <RouterLink :to="{ name: 'editCharacter', params: { id: id } }">
+              <button type="button">Edit</button>
+            </RouterLink>
+            <button @click="() => store.deleteCharacter(character)">Delete</button>
+          </div>
         </td>
       </tr>
     </tbody>
@@ -54,5 +59,11 @@ thead th {
 
 tr {
   min-height: 1rem;
+}
+
+.character-select {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 </style>
