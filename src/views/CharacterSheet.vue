@@ -56,7 +56,7 @@ function newQuest() {
       <p v-if="character.luthe">
         (which means <em>{{ character.luthe }} </em>)
       </p>
-      <p>who is dying of {{ character.bane }}</p>
+      <h3>Dying of {{ character.bane }}</h3>
       <ul>
         <li>Technique: {{ character.technique }}</li>
         <li>Sphere: {{ character.sphere }}</li>
@@ -66,19 +66,28 @@ function newQuest() {
     </template>
 
     <template #attributes>
-      <div class="flex-column">
-        <div v-for="(attribute, i) in ATTRIBUTES" :key="i">
-          {{ attribute }}: {{ character.attributes.get(attribute) }}
-        </div>
+      <div class="heading">
+        <h4 class="attribute-title">Attributes</h4>
+      </div>
+      <div id="attributes">
+        <template v-for="(attribute, i) of ATTRIBUTES" :key="i">
+          <span class="attribute-name"> {{ attribute }} </span>
+          <span> {{ character?.attributes.get(attribute) }} </span>
+        </template>
       </div>
     </template>
+
     <template #costs>
-      <div class="flex-column">
-        <div v-for="(cost, i) in COSTS" :key="i">
-          {{ cost }}: <button @click="() => tickDown(cost)">-</button>
-          {{ character.costs.get(cost) }}
-          <button @click="() => tickUp(cost)">+</button>
-        </div>
+      <h4 class="cost-title">Costs</h4>
+      <div id="costs">
+        <template v-for="cost of character?.costs.keys()" :key="cost">
+          <span class="cost-name"> {{ cost }} </span>
+          <div>
+            <button @click="() => tickDown(cost)">-</button>
+            <span class="cost-value"> {{ character.costs.get(cost) }} </span>
+            <button @click="() => tickUp(cost)">+</button>
+          </div>
+        </template>
       </div>
     </template>
 

@@ -1,7 +1,6 @@
 <template>
   <div id="character-sheet">
     <div id="character-info" class="character-section">
-      <h2>About</h2>
       <slot name="character-info"> </slot>
     </div>
     <div id="character-stats" class="character-section">
