@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Quest } from '@/types'
-const quest = defineModel({ type: Quest })
+const quest = defineModel<Quest>({ required: true })
 </script>
 
 <template>
@@ -10,11 +10,12 @@ const quest = defineModel({ type: Quest })
       <div class="xp-tracker">
         <span class="xp"> {{ quest.xp }}</span> out of
         <span class="xp-max">{{ quest.xp_needed }}</span>
+        <button type="button" @click="quest.xp += 1">+1 XP</button>
       </div>
       <div class="quest-description">
         {{ quest.description }}
       </div>
-      <div v-if="quest.conditions.anytime">
+      <div v-if="quest.conditions.kind == 'anytime'">
         <h5>Bonus XP</h5>
         <p>Earn 1 bonus XP towards this quest whenever:</p>
         <p>{{ quest.conditions.anytime }}</p>

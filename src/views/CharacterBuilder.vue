@@ -3,13 +3,14 @@ import EditGift from '@/components/EditGift.vue'
 import EditQuest from '@/components/EditQuest.vue'
 import {
   ATTRIBUTES,
-  Bond,
+  type Bond,
   Character,
   CHARPT_MAX,
   COSTS,
   Gift,
   Quest,
-  type Attribute
+  type Attribute,
+  type Cost
 } from '@/types'
 import { computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -24,6 +25,11 @@ function getCharacter(): Character {
   if (route.name === 'newCharacter') {
     return store.newCharacter()
   } else {
+    if (typeof route.params.id !== 'string') {
+      alert(`unexpected paramters: ${route.params}`)
+      router.back()
+      throw 'unreachable'
+    }
     let char = store.characters.get(parseInt(route.params.id))
     if (char === undefined) {
       router.push({ name: 'newCharacter' })
@@ -32,6 +38,7 @@ function getCharacter(): Character {
     return char
   }
 }
+
 function addCharacter() {
   router.push({ name: 'character', params: { id: character.id } })
 }
@@ -39,7 +46,7 @@ function addCharacter() {
 watch(character, (c) => store.saveCharacter(c))
 
 function newBond() {
-  character.bonds.push(new Bond())
+  character.bonds.push({ truth: '', technique: '' } as Bond)
 }
 
 function newGeas() {
@@ -61,22 +68,16 @@ for (let gift of character.gifts) {
 }
 
 function tickUp(attribute: Attribute) {
-  let val = attributes.get(attribute)
-  if (val === undefined) {
-    return
-  }
+  let val = attributes[attribute]
   if (val < 7) {
-    attributes.set(attribute, val + 1)
+    attributes[attribute] = val + 1
   }
 }
 
 function tickDown(attribute: Attribute) {
-  let val = attributes.get(attribute)
-  if (val === undefined) {
-    return
-  }
+  let val = attributes[attribute]
   if (val > 0) {
-    attributes.set(attribute, val - 1)
+    attributes[attribute] = val - 1
   }
 }
 
@@ -84,10 +85,10 @@ let costs = computed(() => {
   let costs = character.costs
   for (let cost of COSTS) {
     if (cost === 'Wear') {
-      costs.set(cost, 40)
+      costs[cost] = 40
     } else {
       let attr = ATTRIBUTES[COSTS.indexOf(cost)]
-      costs.set(cost, (attributes.get(attr) || 0) * 10)
+      costs[cost] = (attributes[attr] || 0) * 10
     }
   }
   return costs
@@ -151,7 +152,7 @@ function newQuest() {
           <span class="attribute-name"> {{ attribute }} </span>
           <div class="attribute-value" :class="'attribute-value-' + i">
             <button @click="() => tickDown(attribute)">-</button>
-            <span> {{ character?.attributes.get(attribute) }} </span>
+            <span> {{ character?.attributes[attribute] }} </span>
             <button @click="() => tickUp(attribute)">+</button>
           </div>
         </template>
@@ -161,9 +162,9 @@ function newQuest() {
     <template #costs>
       <h4 class="cost-title">Starting Costs</h4>
       <div id="costs">
-        <template v-for="cost of character?.costs.keys()" :key="cost">
+        <template v-for="cost of COSTS" :key="cost">
           <span class="cost-name"> {{ cost }} </span>
-          <span class="cost-value"> {{ costs.get(cost) }} </span>
+          <span class="cost-value"> {{ costs[cost] }} </span>
         </template>
       </div>
     </template>
@@ -219,7 +220,7 @@ function newQuest() {
     </template>
     <template #treasures>
       <p>
-        <em>{{ character.treasures.length }} of {{ character.attributes.get('Flore') + 1 }}</em>
+        <em>{{ character.treasures.length }} of {{ character.attributes['Flore'] + 1 }}</em>
       </p>
       <p v-for="(_treasure, i) in character?.treasures" :key="i">
         <input type="text" v-model="character.treasures[i]" />
@@ -228,7 +229,7 @@ function newQuest() {
       <button
         type="button"
         @click="newTreasure()"
-        :disabled="character.treasures.length >= character.attributes.get('Flore') + 1"
+        :disabled="character.treasures.length >= character.attributes['Flore'] + 1"
       >
         Add Treasure
       </button>

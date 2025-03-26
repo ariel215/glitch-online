@@ -11,13 +11,22 @@ const router = useRouter()
 const route = useRoute()
 const store = useCharacterStore()
 const character = getCharacter()
+
 function getCharacter(): Character {
-  let char = store.characters.get(parseInt(route.params.id))
-  if (char === undefined) {
-    alert('Could not find character requested')
+  if (typeof route.params.id == 'string') {
+    let char = store.characters.get(parseInt(route.params.id))
+    if (char === undefined) {
+      alert('Could not find character requested')
+      router.back()
+      throw 'unreachable'
+    } else {
+      return char
+    }
+  } else {
+    alert('wrong number of parameters')
     router.back()
+    throw 'unreachable'
   }
-  return char
 }
 
 watch(character, (c: Character) => {
@@ -26,16 +35,16 @@ watch(character, (c: Character) => {
 })
 
 function tickDown(cost: Cost) {
-  let c = character.costs.get(cost)
+  let c = character.costs[cost]
   if (c) {
-    character.costs.set(cost, c - 1)
+    character.costs[cost] = c - 1
   }
 }
 
 function tickUp(cost: Cost) {
-  let c = character.costs.get(cost)
+  let c = character.costs[cost]
   if (c) {
-    character.costs.set(cost, c + 1)
+    character.costs[cost] = c + 1
   }
 }
 
@@ -72,7 +81,7 @@ function newQuest() {
       <div id="attributes">
         <template v-for="(attribute, i) of ATTRIBUTES" :key="i">
           <span class="attribute-name"> {{ attribute }} </span>
-          <span> {{ character?.attributes.get(attribute) }} </span>
+          <span> {{ character?.attributes[attribute] }} </span>
         </template>
       </div>
     </template>
@@ -80,11 +89,11 @@ function newQuest() {
     <template #costs>
       <h4 class="cost-title">Costs</h4>
       <div id="costs">
-        <template v-for="cost of character?.costs.keys()" :key="cost">
+        <template v-for="cost in COSTS" :key="cost">
           <span class="cost-name"> {{ cost }} </span>
           <div>
             <button @click="() => tickDown(cost)">-</button>
-            <span class="cost-value"> {{ character.costs.get(cost) }} </span>
+            <span class="cost-value"> {{ character.costs[cost] }} </span>
             <button @click="() => tickUp(cost)">+</button>
           </div>
         </template>
@@ -103,16 +112,31 @@ function newQuest() {
     </template>
 
     <template #geasa>
-      <p v-for="(geas, i) in character.geasa" :key="i">{{ geas }}</p></template
-    >
+      <h4 v-if="character.geasa.length">Geasa</h4>
+      <p v-for="(geas, i) in character.geasa" :key="i">{{ geas }}</p>
+    </template>
+
+    <template #treasures>
+      <div v-if="!character.treasures.length">No treasures yet</div>
+      <div class="treasure" v-for="(treasure, i) in character.treasures" :key="i">
+        <span class="description"> {{ treasure }} </span>
+      </div>
+    </template>
+
+    <template #arcana>
+      <div v-if="!character.arcana.length">No arcana yet</div>
+      <div class="arcana" v-for="(arcana, i) in character.arcana" :key="i">
+        <span class="description"> {{ arcana }} </span>
+      </div>
+    </template>
 
     <template #quests>
-      <!-- <QuestCard
+      <QuestCard
         v-for="(quest, i) in character.quests"
         :key="i"
         v-model="character.quests[i]"
         @mark="(xp: number) => markXP(quest, xp)"
-      ></QuestCard> -->
+      ></QuestCard>
       <EditQuest
         v-if="editingQuest"
         v-model="character.quests[character.quests.length - 1]"

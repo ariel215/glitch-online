@@ -12,7 +12,6 @@
     <div id="character-features" class="character-section">
       <slot name="gifts"></slot>
       <slot name="bonds"></slot>
-      <h4>Geasa</h4>
       <slot name="geasa"></slot>
     </div>
     <div id="treasures-arcana" class="character-section">
@@ -87,7 +86,7 @@
   margin-right: 1em;
 }
 
-.character-section {
+.character-section:has(div) {
   border-bottom: 1px solid grey;
   padding-bottom: 10px;
   margin-bottom: 5px;

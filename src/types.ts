@@ -1,12 +1,22 @@
-export type Attribute = 'Eide' | 'Flore' | 'Lore' | 'Wyrd' | 'Ability'
-export type Cost = 'Stilling' | 'Immersion' | 'Fuge' | 'Burn' | 'Wear'
-export const ATTRIBUTES: Array<Attribute> = ['Eide', 'Flore', 'Lore', 'Wyrd', 'Ability']
-export const COSTS: Array<Cost> = ['Stilling', 'Immersion', 'Fuge', 'Burn', 'Wear']
+export const ATTRIBUTES = ['Eide', 'Flore', 'Lore', 'Wyrd', 'Ability'] as const
+export const COSTS = ['Stilling', 'Immersion', 'Fuge', 'Burn', 'Wear'] as const
+export type Attribute = (typeof ATTRIBUTES)[number]
+type AttributeMap = {
+  [key in Attribute]: number
+}
+export type Cost = (typeof COSTS)[number]
+type CostMap = {
+  [key in Cost]: number
+}
 export const CHARPT_MAX: number = 25
+
+export type Bond = {
+  technique: string
+  truth: string
+}
 
 export class Character {
   static curr_id = 0
-
   id: number
   playerName: string = '(Unknown)'
   characterName: string = '(Unknown)'
@@ -16,8 +26,21 @@ export class Character {
   sanctuary: string = ''
   sphere: string = ''
   destruction: string = ''
-  attributes: Map<Attribute, number> = new Map()
-  costs: Map<Cost, number> = new Map()
+  attributes: AttributeMap = {
+    Eide: 0,
+    Flore: 0,
+    Lore: 0,
+    Wyrd: 0,
+    Ability: 0
+  }
+  costs: CostMap = {
+    Stilling: 0,
+    Immersion: 0,
+    Fuge: 0,
+    Burn: 0,
+    Wear: 0
+  }
+
   infection_level: number = 2
   gifts: Array<Gift> = []
   bonds: Array<Bond> = []
@@ -30,29 +53,15 @@ export class Character {
     if (!params) {
       this.id = Character.curr_id
       Character.curr_id += 1
-      for (const attr of ATTRIBUTES) {
-        this.attributes.set(attr, 0)
-      }
-      for (const cost of COSTS) {
-        this.costs.set(cost, 0)
-      }
     } else {
       this.id = Character.curr_id
       Object.assign(this, params)
-      this.attributes = new Map()
-      for (const [k, v] of Object.entries(params.attributes)) {
-        this.attributes.set(k, v)
-      }
-      this.costs = new Map()
-      for (const [k, v] of Object.entries(params.costs)) {
-        this.costs.set(k, v)
-      }
     }
   }
 
   cp() {
     let total = 0
-    for (const [attr, val] of this.attributes) {
+    for (const [attr, val] of Object.entries(this.attributes)) {
       total += val * (attr === 'Ability' ? 3 : 2)
     }
     for (const gift of this.gifts) {
@@ -62,11 +71,6 @@ export class Character {
     total += this.geasa.length
     return total
   }
-}
-
-export class Bond {
-  truth!: string
-  technique!: string
 }
 
 export type Geas = string
@@ -90,6 +94,7 @@ export class Gift {
   constructor(params: Gift = {} as Gift) {
     Object.assign(this, params)
   }
+
   price(): number {
     let cost = 0
     cost += ACTIVATIONS.indexOf(this.activation) * -2 + 1
@@ -97,18 +102,6 @@ export class Gift {
     cost += FLEXIBILITIES.indexOf(this.flexibility) * -2 + 1
     cost += this.level
     return Math.min(cost, 1)
-  }
-
-  copy(): Gift {
-    const copy = new Gift()
-    copy.level = this.level
-    copy.name = this.name
-    copy.description = this.description
-    copy.cost = this.cost
-    copy.activation = this.activation
-    copy.range = this.range
-    copy.flexibility = this.flexibility
-    return copy
   }
 }
 
@@ -132,10 +125,12 @@ export class Arc {
 }
 
 export type Anytime = {
+  kind: 'anytime'
   anytime: string
 }
 
 export type Storyline = {
+  kind: 'storyline'
   major: Array<string>
   minor: Array<string>
 }
@@ -154,15 +149,7 @@ export class Quest implements QuestDescription {
   arcs: Array<Arc> = []
   xp_needed: number = 25
   xp: number = 0
-  conditions:
-    | {
-        anytime: string
-      }
-    | {
-        major: Array<string>
-        minor: Array<string>
-      } = { anytime: '' }
-
+  conditions: Anytime | Storyline = { kind: 'anytime', anytime: '' }
   constructor(params: QuestDescription = {} as QuestDescription) {
     Object.assign(this, params)
   }

@@ -28,14 +28,14 @@ export const useCharacterStore = defineStore('characters', () => {
     character_ids.add(character.id)
     localStorage.setItem('character_ids', JSON.stringify([...character_ids]))
     saveCharacter(character)
-    return characters.value.get(character.id)
+    return characters.value.get(character.id) || character
   }
 
   /// Save to localStorage
   function saveCharacter(character: Character) {
     function replacer(key: any, value: any) {
       if (value instanceof Map) {
-        const new_value = {}
+        const new_value: any = {}
         for (const [vkey, vval] of value.entries()) {
           new_value[vkey] = vval
         }

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ACTIVATIONS, COSTS, FLEXIBILITIES, Gift, RANGES } from '@/types'
-let gift = defineModel({ type: Gift })
+let gift = defineModel<Gift>({ required: true })
+defineEmits(['close'])
 </script>
 
 <template>
@@ -8,7 +9,7 @@ let gift = defineModel({ type: Gift })
     <div class="card-header">
       <label> Name: <input type="text" id="name-input" v-model="gift.name" /> </label>
       <em> {{ gift.price() }} CP </em>
-      <button id="button-close" @click="$emit('close')">X</button>
+      <button id="button-close" @click="$emit('close', null)">X</button>
     </div>
     <div class="card-body">
       <label>

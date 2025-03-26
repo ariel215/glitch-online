@@ -9,7 +9,7 @@ const { quest } = defineProps<{ quest: QuestDescription }>()
     <h1>{{ quest.name }}</h1>
     <span v-for="(arc, i) in quest.arcs" :key="i"> {{ arc.toString() }}</span>
     <p>{{ quest.description }}</p>
-    <div v-if="quest.conditions.anytime">
+    <div v-if="quest.conditions.kind == 'anytime'">
       Once every 15 minutes or so, whenever you {{ quest.conditions.anytime }}, the GM may award you
       1 XP.
     </div>

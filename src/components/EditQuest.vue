@@ -4,11 +4,13 @@ import { ref, useTemplateRef, type Ref } from 'vue'
 
 type questMode = 'anytime' | 'storyline'
 let mode: Ref<questMode> = ref('anytime')
-let quest = defineModel({ type: Quest })
+let quest = defineModel<Quest>({ required: true })
 let anytime: Anytime = {
+  kind: 'anytime',
   anytime: ''
 }
 let storyline: Storyline = {
+  kind: 'storyline',
   major: [],
   minor: []
 }
@@ -69,7 +71,7 @@ function updateConditions() {
         </label>
         <div v-if="mode === 'anytime'" id="anytime-quest">
           <p>Mark 1 XP on this quest any time you do the following:</p>
-          <textarea id="quest-action" v-model="anytime"></textarea>
+          <textarea id="quest-action" v-model="anytime.anytime"></textarea>
         </div>
         <div v-if="mode === 'storyline'" id="storyline-quest">
           <p>Get 5 xp, once, if:</p>
