@@ -170,8 +170,7 @@ function newQuest() {
     </template>
 
     <template #gifts>
-      <h4 v-if="character.gifts">Gifts</h4>
-      <p><em> 1+ points each</em></p>
+      <p><span class="small-heading">Gifts </span> <em> (1+ points each)</em></p>
       <div id="gifts" class="card-list">
         <div v-for="(gift, index) in character?.gifts" :key="index">
           <EditGift
@@ -184,8 +183,7 @@ function newQuest() {
     </template>
 
     <template #bonds>
-      <h4>Bonds</h4>
-      <p><em> 1 point each </em></p>
+      <p><span class="small-heading"> Bonds </span><em> (1 point each) </em></p>
       <div class="card-list">
         <div v-for="(bond, i) in character?.bonds" :key="i" class="card card-small">
           <div class="card-header">
@@ -205,7 +203,9 @@ function newQuest() {
     </template>
 
     <template #geasa>
-      <p><em> 1 point each </em></p>
+      <p>
+        <span class="small-heading"> Geasa </span> <span><em> (1 point each )</em></span>
+      </p>
       <div class="card-list">
         <div v-for="(geas, i) in character?.geasa" :key="geas" class="card card-small">
           <div class="card-header">
@@ -218,45 +218,42 @@ function newQuest() {
       </div>
       <button type="button" @click="newGeas()">Add Geas</button>
     </template>
+
     <template #treasures>
       <p>
         <em>{{ character.treasures.length }} of {{ character.attributes['Flore'] + 1 }}</em>
       </p>
-      <p v-for="(_treasure, i) in character?.treasures" :key="i">
-        <input type="text" v-model="character.treasures[i]" />
-        <button type="button" @click="character.treasures.splice(i, 1)">X</button>
-      </p>
-      <button
-        type="button"
-        @click="newTreasure()"
-        :disabled="character.treasures.length >= character.attributes['Flore'] + 1"
-      >
-        Add Treasure
-      </button>
+      <glitch-box>
+        <p v-for="(_treasure, i) in character?.treasures" :key="i">
+          <input type="text" v-model="character.treasures[i]" />
+          <button type="button" @click="character.treasures.splice(i, 1)">X</button>
+        </p>
+        <button
+          type="button"
+          @click="newTreasure()"
+          :disabled="character.treasures.length >= character.attributes['Flore'] + 1"
+        >
+          Add Treasure
+        </button>
+      </glitch-box>
     </template>
 
     <template #arcana>
       <p id="arcana-count">
         <em>{{ character?.arcana.length }} of 12</em>
       </p>
-      <p v-for="(_arcanum, i) in character?.arcana" :key="i">
-        <input type="text" v-model="character.arcana[i]" />
-        <button type="button" @click="character.arcana.splice(i, 1)">X</button>
-      </p>
-      <button type="button" @click="newArcanum()" :disabled="character.arcana.length >= 12">
-        Add Arcanum
-      </button>
+      <glitch-box>
+        <p v-for="(_arcanum, i) in character?.arcana" :key="i">
+          <input type="text" v-model="character.arcana[i]" />
+          <button type="button" @click="character.arcana.splice(i, 1)">X</button>
+        </p>
+        <button type="button" @click="newArcanum()" :disabled="character.arcana.length >= 12">
+          Add Arcanum
+        </button>
+      </glitch-box>
     </template>
     <template #quests>
-      <div v-if="character.quests.length">
-        <EditQuest v-model="character.quests[0]" />
-        <button type="button" @click="() => (character.quests = [])">X</button>
-      </div>
-      <div v-else>
-        <button type="button" @click="newQuest()" :disabled="character.quests.length > 0">
-          Create New Quest
-        </button>
-      </div>
+      <EditQuest v-model="character.quests[0]" />
     </template>
   </CharacterSheetTemplate>
   <button type="button" :disabled="!characterComplete" @click="addCharacter()">
@@ -303,5 +300,22 @@ input {
 
 .card-small {
   width: 20rem;
+}
+
+.small-heading {
+  font-size: 1.5 rem;
+  font-family: 'Cormorant Garamond', 'Garamond', 'serif';
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+glitch-box {
+  display: flex;
+  flex-direction: row;
+}
+
+glitch-box > * {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 </style>

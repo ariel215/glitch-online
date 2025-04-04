@@ -34,27 +34,8 @@ watch(character, (c: Character) => {
   store.saveCharacter(c)
 })
 
-function tickDown(cost: Cost) {
-  let c = character.costs[cost]
-  if (c) {
-    character.costs[cost] = c - 1
-  }
-}
-
-function tickUp(cost: Cost) {
-  let c = character.costs[cost]
-  if (c) {
-    character.costs[cost] = c + 1
-  }
-}
-
 function markXP(quest: Quest, xp: number) {
   quest.xp += xp
-}
-
-let editingQuest = false
-function newQuest() {
-  editingQuest = true
 }
 </script>
 
@@ -92,9 +73,7 @@ function newQuest() {
         <template v-for="cost in COSTS" :key="cost">
           <span class="cost-name"> {{ cost }} </span>
           <div>
-            <button @click="() => tickDown(cost)">-</button>
-            <span class="cost-value"> {{ character.costs[cost] }} </span>
-            <button @click="() => tickUp(cost)">+</button>
+            <input type="number" v-model="character.costs[cost]" />
           </div>
         </template>
       </div>
@@ -118,30 +97,51 @@ function newQuest() {
 
     <template #treasures>
       <div v-if="!character.treasures.length">No treasures yet</div>
-      <div class="treasure" v-for="(treasure, i) in character.treasures" :key="i">
-        <span class="description"> {{ treasure }} </span>
-      </div>
+      <p>
+        <em>{{ character.treasures.length }} of {{ character.attributes['Flore'] + 1 }}</em>
+      </p>
+      <p v-for="(_treasure, i) in character?.treasures" :key="i">
+        <input type="text" v-model="character.treasures[i]" />
+        <button type="button" @click="character.treasures.splice(i, 1)">X</button>
+      </p>
+      <button
+        type="button"
+        @click="character.treasures.push('')"
+        :disabled="character.treasures.length >= character.attributes['Flore'] + 1"
+      >
+        Add Treasure
+      </button>
     </template>
 
     <template #arcana>
       <div v-if="!character.arcana.length">No arcana yet</div>
-      <div class="arcana" v-for="(arcana, i) in character.arcana" :key="i">
-        <span class="description"> {{ arcana }} </span>
+      <div v-else>
+        <p id="arcana-count">
+          <em>{{ character?.arcana.length }} of 12</em>
+        </p>
+        <p v-for="(_arcanum, i) in character?.arcana" :key="i">
+          <input type="text" v-model="character.arcana[i]" />
+          <button type="button" @click="character.arcana.splice(i, 1)">X</button>
+        </p>
+        <button
+          type="button"
+          @click="character.arcana.push('')"
+          :disabled="character.arcana.length >= 12"
+        >
+          Add Arcanum
+        </button>
       </div>
     </template>
 
     <template #quests>
-      <QuestCard
-        v-for="(quest, i) in character.quests"
+      <EditQuest
+        v-for="(_, i) in character.quests"
         :key="i"
         v-model="character.quests[i]"
-        @mark="(xp: number) => markXP(quest, xp)"
-      ></QuestCard>
-      <EditQuest
-        v-if="editingQuest"
-        v-model="character.quests[character.quests.length - 1]"
       ></EditQuest>
-      <button @click="newQuest" :disabled="character.quests.length >= 5">Add Quest</button>
+      <button @click="character.quests.push(new Quest())" :disabled="character.quests.length >= 5">
+        Add Quest
+      </button>
     </template>
   </CharacterSheetTemplate>
 </template>

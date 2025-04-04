@@ -53,6 +53,7 @@ export class Character {
     if (!params) {
       this.id = Character.curr_id
       Character.curr_id += 1
+      this.quests.push(new Quest())
     } else {
       this.id = Character.curr_id
       Object.assign(this, params)
@@ -65,7 +66,7 @@ export class Character {
       total += val * (attr === 'Ability' ? 3 : 2)
     }
     for (const gift of this.gifts) {
-      total += gift.price()
+      total += price(gift)
     }
     total += this.bonds.length
     total += this.geasa.length
@@ -94,15 +95,15 @@ export class Gift {
   constructor(params: Gift = {} as Gift) {
     Object.assign(this, params)
   }
+}
 
-  price(): number {
-    let cost = 0
-    cost += ACTIVATIONS.indexOf(this.activation) * -2 + 1
-    cost += RANGES.indexOf(this.range) * -2 + 1
-    cost += FLEXIBILITIES.indexOf(this.flexibility) * -2 + 1
-    cost += this.level
-    return Math.min(cost, 1)
-  }
+export function price(gift: Gift) {
+  let cost = 0
+  cost += ACTIVATIONS.indexOf(gift.activation) * -2 + 1
+  cost += RANGES.indexOf(gift.range) * -2 + 1
+  cost += FLEXIBILITIES.indexOf(gift.flexibility) * -2 + 1
+  cost += gift.level
+  return Math.max(cost, 1)
 }
 
 export const QUESTARCS = ['Bindings', 'Sheperd', 'Emptiness']
@@ -138,7 +139,7 @@ export type Storyline = {
 export type QuestDescription = {
   name?: string
   description?: string
-  arcs?: Array<Arc>
+  arc: Arc
   xp_needed?: number
   conditions: Anytime | Storyline
 }
@@ -146,7 +147,10 @@ export type QuestDescription = {
 export class Quest implements QuestDescription {
   name: string = ''
   description: string = ''
-  arcs: Array<Arc> = []
+  arc: Arc = {
+    arc: QuestArc.Bindings,
+    position: 1
+  }
   xp_needed: number = 25
   xp: number = 0
   conditions: Anytime | Storyline = { kind: 'anytime', anytime: '' }
