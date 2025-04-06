@@ -7,7 +7,7 @@ const { quest } = defineProps<{ quest: QuestDescription }>()
 <template>
   <div>
     <h1>{{ quest.name }}</h1>
-    <span v-for="(arc, i) in quest.arcs" :key="i"> {{ arc.toString() }}</span>
+    <span> {{ quest.arc.toString() }}</span>
     <p>{{ quest.description }}</p>
     <div v-if="quest.conditions.kind == 'anytime'">
       Once every 15 minutes or so, whenever you {{ quest.conditions.anytime }}, the GM may award you
