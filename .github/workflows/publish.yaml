@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write # for actions/checkout
+  pages: write # for peaceiris/actions-gh-pages
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -30,5 +34,8 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
+          publish_branch: glitch
+          deploy_key: ${{ secrets.PERSONAL_ACCESS_TOKEN}}
+          external_repository: ariel215/ariel215.github.io
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
